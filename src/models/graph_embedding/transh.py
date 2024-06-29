@@ -1,7 +1,7 @@
 import math
 import torch
 import torch.nn.functional as F
-from .base import GraphEmbedding
+from base import GraphEmbedding
 
 class transH(GraphEmbedding):
     def __init__(
@@ -9,8 +9,8 @@ class transH(GraphEmbedding):
         node_num: int, 
         relation_num: int, 
         hidden_channels: int,
-        p_norm: float = 1.0,
-        margin: float = 1.0       
+        margin: float = 1.0,       
+        p_norm: float = 2.0
     ):
         super().__init__(
             node_num, 
@@ -46,6 +46,7 @@ class transH(GraphEmbedding):
     ) -> torch.Tensor:
         head = self.node_emb(head_index)
         tail = self.node_emb(tail_index)
+
         
         d_r_emb = self.d_r_emb(rel_type)
         w_r_rmb = F.normalize(self.w_r_emb(rel_type), p=self.p_norm, dim=-1)
@@ -53,7 +54,10 @@ class transH(GraphEmbedding):
         h_proj = head - (w_r_rmb * head).sum(dim=1).unsqueeze(dim=1) * w_r_rmb
         t_proj = tail - (w_r_rmb * tail).sum(dim=1).unsqueeze(dim=1) * w_r_rmb
         
-        score = -(((h_proj + d_r_emb) - t_proj).norm(p=self.p_norm, dim=-1))**2
+        h_proj = F.normalize(h_proj, p=self.p_norm, dim=-1)
+        t_proj = F.normalize(t_proj, p=self.p_norm, dim=-1)
+        
+        score = -((h_proj + d_r_emb - t_proj ).norm(p=self.p_norm, dim=-1))**2
         
         return score
         

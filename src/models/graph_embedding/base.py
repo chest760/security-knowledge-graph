@@ -13,11 +13,11 @@ class GraphEmbedding(torch.nn.Module, metaclass=ABCMeta):
         self.relation_emb = torch.nn.Embedding(relation_num, hidden_channels)
         self.hidden_channels = hidden_channels
     
-    @abstractmethod()
+    @abstractmethod
     def reset_parmeters(self):
         pass
     
-    @abstractmethod()
+    @abstractmethod
     def forward(
         head_index:torch.Tensor,
         rel_type:torch.Tensor,

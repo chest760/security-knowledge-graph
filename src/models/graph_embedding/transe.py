@@ -1,7 +1,7 @@
 import math
 import torch
 import torch.nn.functional as F
-from .base import GraphEmbedding
+from base import GraphEmbedding
 
 class transE(GraphEmbedding):
     def __init__(self, 
@@ -9,7 +9,7 @@ class transE(GraphEmbedding):
                  relation_num: int, 
                  hidden_channels: int,
                  margin: float = 1.0,
-                 p_norm: float = 1.0,
+                 p_norm: float = 2.0,
                 ):
         super().__init__(
             node_num, 
