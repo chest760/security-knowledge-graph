@@ -90,10 +90,10 @@ class Model(torch.nn.Module):
         proj_head_s = head_s - (w_r_rmb * head_s).sum(dim=1).unsqueeze(dim=1) * w_r_rmb
         proj_tail_s = tail_s - (w_r_rmb * tail_s).sum(dim=1).unsqueeze(dim=1) * w_r_rmb
         
-        f_ss =  -(((proj_head_s + d_r_emb - proj_tail_s).norm(p=self.p_norm, dim=-1))) ** 2
-        f_dd =  -(((proj_head_d + d_r_emb - proj_tail_d).norm(p=self.p_norm, dim=-1))) ** 2
-        f_sd =  -(((proj_head_s + d_r_emb - proj_tail_d).norm(p=self.p_norm, dim=-1))) ** 2
-        f_ds =  -(((proj_head_d + d_r_emb - proj_tail_s).norm(p=self.p_norm, dim=-1))) ** 2
+        f_ss =  -(((head_s + d_r_emb - tail_s).norm(p=self.p_norm, dim=-1))) ** 2
+        f_dd =  -(((head_d + d_r_emb - tail_d).norm(p=self.p_norm, dim=-1))) ** 2
+        f_sd =  -(((head_s + d_r_emb - tail_d).norm(p=self.p_norm, dim=-1))) ** 2
+        f_ds =  -(((head_d + d_r_emb - tail_s).norm(p=self.p_norm, dim=-1))) ** 2
         
         f_r = f_ss + f_dd + f_sd + f_ds
         
