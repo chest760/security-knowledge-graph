@@ -2,3 +2,4 @@
 .env
 .devcontainer
 __pycache__
+GoogleNews-vectors-negative300.bin

@@ -29,14 +29,15 @@ cwe["ID"] = ["CWE-" + str(id) for id in cwe["CWE-ID"]]
 cve["ID"] = [str(id) for id in cve["CVE-ID"]]
 
 # IDを数字にマッピング
-dataset = pd.concat([capec["ID"], cwe["ID"], cve["ID"]]).reset_index(drop=True)
+dataset = pd.concat([capec[["ID", "Description"]], cwe[["ID", "Description"]], cve[["ID", "Description"]]]).reset_index(drop=True)
+
 mapped_id = pd.DataFrame(
     data={
-        "ID": dataset,
+        "ID": dataset["ID"],
+        "Description": dataset["Description"],
         "mappedID": range(len(dataset))
     }
 )
-
 
 mapped_relation = {
     "ParentOf": 0,
@@ -59,7 +60,6 @@ def get_mapped_id(
         id = "CWE-"+str(id.value)
     else:
         id: str = str(id.value)
-        
     
     return mapped_id[mapped_id["ID"] == id]["mappedID"].item()
 
@@ -129,8 +129,8 @@ def add_reverse_edge(triples: torch.Tensor) -> torch.Tensor:
             new_triples.append([id2, 2, id1])
             new_triples.append([id1, 3, id2])
         elif rel == 3:
-            new_triples.append((id1, 3, id2))
-            new_triples.append((id2, 2 ,id1))
+            new_triples.append([id1, 3, id2])
+            new_triples.append([id2, 2 ,id1])
         elif rel == 4:
             new_triples.append([id1, 4, id2])
             new_triples.append([id2, 4, id1])
@@ -140,15 +140,15 @@ def add_reverse_edge(triples: torch.Tensor) -> torch.Tensor:
         elif rel == 6:
             new_triples.append([id1, 6, id2])
             new_triples.append([id2, 5, id1])
+        elif rel == 7:
+            new_triples.append([id1, 7, id2])
     
     return torch.tensor(new_triples)
 
-
-
-       
-    
-    
-    
-    
-    
-    
+ 
+if __name__ == "__main__":
+    triples = create_postive_triples()
+    print(len(triples[:, 1]))
+    triples = add_reverse_edge(triples)
+    print(len(triples[:, 1]))
+    print(triples)

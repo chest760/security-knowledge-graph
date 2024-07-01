@@ -14,7 +14,7 @@ class GraphEmbedding(torch.nn.Module, metaclass=ABCMeta):
         self.hidden_channels = hidden_channels
     
     @abstractmethod
-    def reset_parmeters(self):
+    def reset_parmerters(self):
         pass
     
     @abstractmethod

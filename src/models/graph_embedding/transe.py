@@ -21,7 +21,7 @@ class transE(GraphEmbedding):
         self.p_norm = p_norm
     
     
-    def reset_parmeters(self):
+    def reset_parmerters(self):
         bound = 6. / math.sqrt(self.hidden_channels)
         torch.nn.init.uniform_(self.node_emb.weight, -bound, bound)
         torch.nn.init.uniform_(self.relation_emb.weight, -bound, bound)

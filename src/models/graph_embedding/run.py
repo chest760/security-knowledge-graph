@@ -76,7 +76,7 @@ model:transH = transH(
     node_num=len(dataset),
     relation_num=8,
     hidden_channels=256,
-    margin=1
+    margin=2.0
 ).to(device)
 
 optimizer = torch.optim.AdamW(model.parameters(), lr=0.01)
@@ -153,10 +153,10 @@ def test(
             for ts in tail_indices.split(batch_size):
                 scores.append(model.forward(h.expand_as(ts).to(device), r.expand_as(ts).to(device), ts.to(device)))
             rank = int((torch.cat(scores).argsort(
-                descending=True) == t).nonzero().view(-1))
+                descending=True) == t).nonzero().view(-1)) + 1
             mean_ranks.append(rank)
-            reciprocal_ranks.append(1 / (rank + 1))
-            hits_at_k.append(rank < k)
+            reciprocal_ranks.append(1 / (rank))
+            hits_at_k.append(rank <= k)
 
         mean_rank = float(torch.tensor(mean_ranks, dtype=torch.float).mean())
         mrr = float(torch.tensor(reciprocal_ranks, dtype=torch.float).mean())

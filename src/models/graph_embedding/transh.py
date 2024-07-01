@@ -25,8 +25,10 @@ class transH(GraphEmbedding):
         self.w_r_emb = torch.nn.Embedding(relation_num, hidden_channels)
         self.p_norm = p_norm
         self.margin = margin
+        
+        self.reset_parmerters()
     
-    def reset_parmeters(self):
+    def reset_parmerters(self):
         bound = 6. / math.sqrt(self.hidden_channels)
         torch.nn.init.uniform_(self.node_emb.weight, -bound, bound)
         torch.nn.init.uniform_(self.relation_emb.weight, -bound, bound)
