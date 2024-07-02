@@ -6,6 +6,8 @@ import pandas as pd
 from gensim.utils import simple_preprocess
 from gensim.models import KeyedVectors, Word2Vec
 import gensim
+import nltk
+from nltk.corpus import stopwords
 
 root_path = os.path.join(os.path.dirname(__file__), "../../")
 model_path = f'{root_path}/src/models/text_embedding/GoogleNews-vectors-negative300.bin'
@@ -35,7 +37,7 @@ class Word2vecModel():
         new_model.build_vocab(processed_new_corpus)
         
         new_model.build_vocab([list(pretrained_model.key_to_index.keys())], update=True)
-        new_model.train(processed_new_corpus, total_examples=len(processed_new_corpus), epochs=5)
+        new_model.train(processed_new_corpus, total_examples=len(processed_new_corpus), epochs=50)
         new_model.save("word2vec.model")
         
         similar_words = new_model.wv.most_similar('machine', topn=5)
@@ -43,7 +45,8 @@ class Word2vecModel():
         
     
     def sentence_to_word2vec(self, sentence):
-        words = sentence.lower().split()[:100]
+        words = [word for word in sentence.lower().split() if word not in stopwords.words("english")]
+        words = words[:100]
         word_vectors = [pretrained_model[word].tolist() for word in words if word in pretrained_model]
         while len(word_vectors) < 100:
             word_vectors.append(np.zeros(300).tolist())

@@ -50,7 +50,7 @@ def create_triples():
             check_dup.append((str(id), str(series["CWE-ID"])))
             check_dup.append((str(series["CWE-ID"]), str(id)))
 
-
+    check_dup = []
     for series in capec.to_dict(orient="records"):
         capec_id: int = series["ID"]
         weaknesses: Union[str, float] = series["Related Weaknesses"]
@@ -58,9 +58,12 @@ def create_triples():
             continue
         weaknesses: list[str] = re.findall(r"::(\d+)", weaknesses)
         for cwe_id in weaknesses:
+            if ("cwe"+str(cwe_id), "capec"+str(capec_id)) in check_dup:
+                continue
             triples.append(["cwe"+str(cwe_id), "capec"+str(capec_id), "TargetOf"])   
+            check_dup.append(("cwe"+str(cwe_id), "capec"+str(capec_id)))
 
-
+    check_dup = []
     for series in cwe.to_dict(orient="records"):
         cwe_id: int = series["CWE-ID"]
         examples: Union[str, float] = series["Observed Examples"]
@@ -68,7 +71,10 @@ def create_triples():
             continue
         examples: list[str] = re.findall(r"::REFERENCE:(CVE-\d+-\d+):DESCRIPTION:([^:]+(?::(?!:)[^:]+)*)", examples)
         for cve_id, description in examples:
+            if (str(cve_id),"cwe"+str(cwe_id)) in check_dup:
+                continue
             triples.append([str(cve_id),"cwe"+str(cwe_id), "ExampleOf"])
+            check_dup.append((str(cve_id),"cwe"+str(cwe_id)))
 
     df = pd.DataFrame(data=triples, columns=["ID1", "ID2", "Relation"])
     df.to_csv("../data/processed/triplet.csv")
@@ -79,4 +85,4 @@ def create_dataset():
     dataset = pd.concat([capec[["ID", "Name", "Description"]], cwe[["ID", "Name", "Description"]], cve[["ID", "Name", "Description"]]]).reset_index(drop=True)
     dataset.to_csv("../data/processed/dataset.csv")
 
-create_dataset()
+create_triples()
