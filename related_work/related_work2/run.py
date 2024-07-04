@@ -53,23 +53,6 @@ def reverse_triplet(triplets: torch.tensor):
             
     return torch.tensor(new_triplets)
 
-def make_triplet_for_train(
-    train_triplet: torch.tensor,
-    valid_triplet: torch.tensor,
-    test_triplet: torch.tensor
-):
-    train_dict = {}
-    valid_dict = {}
-    test_dict = {}
-    train_dict["edge_index"] = train_triplet
-    train_dict["edge_label_index"] = train_triplet,
-    valid_dict["edge_index"] = train_triplet
-    valid_dict["edge_label_index"] = valid_triplet,
-    test_dict["edge_index"] = torch.concat([train_triplet, valid_triplet])
-    test_dict["edge_label_index"] = test_triplet,
-    
-    return train_dict, valid_dict, test_dict
-
 def split_data(
     triples: torch.Tensor,
     train: int=0.85,

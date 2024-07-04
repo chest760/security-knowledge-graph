@@ -1,6 +1,7 @@
 import torch
 from transe import TransE
 from word2vec import Word2vecModel
+from gat.gat_layer import GAT
 
 class Encoder(torch.nn.Module):
     def __init__(
@@ -24,6 +25,8 @@ class Encoder(torch.nn.Module):
         self.word2vec = Word2vecModel()
     
     def forward(self):
+        self,
+        
         pass
     
     
