@@ -1,5 +1,7 @@
 .vscode
 .env
 .devcontainer
+*.model.*
+*.model
 __pycache__
 GoogleNews-vectors-negative300.bin
