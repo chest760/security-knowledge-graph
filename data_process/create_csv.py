@@ -73,7 +73,7 @@ def create_triples():
         for cve_id, description in examples:
             if (str(cve_id),"cwe"+str(cwe_id)) in check_dup:
                 continue
-            triples.append([str(cve_id),"cwe"+str(cwe_id), "ExampleOf"])
+            triples.append([str(cve_id),"cwe"+str(cwe_id), "InstanceOf"])
             check_dup.append((str(cve_id),"cwe"+str(cwe_id)))
 
     df = pd.DataFrame(data=triples, columns=["ID1", "ID2", "Relation"])

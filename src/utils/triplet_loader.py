@@ -4,8 +4,13 @@ import torch
 from torch import Tensor
 
 class TripletLoader(torch.utils.data.DataLoader):
-    def __init__(self, head_index: Tensor, rel_type: Tensor,
-                 tail_index: Tensor, **kwargs):
+    def __init__(
+        self, 
+        head_index: Tensor, 
+        rel_type: Tensor,
+        tail_index: Tensor, 
+        **kwargs
+    ):
         self.head_index = head_index
         self.rel_type = rel_type
         self.tail_index = tail_index

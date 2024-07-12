@@ -2,6 +2,7 @@ import torch
 from .base import TextEmbedding
 from transformers import AutoTokenizer, AutoModel
 
+
 class SentenceTransformer(TextEmbedding):
     def __init__(self):
         super().__init__()

@@ -32,7 +32,8 @@ rel_type = Literal[
     "PeerOf",
     "TragetOf",
     "AttackOf",
-    "ExampleOf"
+    "InstanceOf",
+    "AbstractionOf"
 ]
 
 def isnan(input: any) -> bool:
@@ -108,7 +109,7 @@ def create_cwe_cve_triples() -> list[tuple[Cve, rel_type, Cwe]]:
             continue
         examples: list[str] = re.findall(r"::REFERENCE:(CVE-\d+-\d+):DESCRIPTION:([^:]+(?::(?!:)[^:]+)*)", examples)
         for cve_id, description in examples:
-            triples.append((Cve(cve_id), "ExampleOf", Cwe(str(cwe_id))))
+            triples.append((Cve(cve_id), "InstanceOf", Cwe(str(cwe_id))))
             if cve_id not in cve_ids:  
                cves.append([cve_id, description])
                cve_ids.append(cve_id)

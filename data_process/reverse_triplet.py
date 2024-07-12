@@ -16,6 +16,8 @@ for series in triplet.to_dict(orient="records"):
         triplets.append([id2, id1, "PeerOf"])
     elif rel == "TargetOf":
         triplets.append([id2, id1, "AttackOf"])
+    elif rel == "InstanceOf":
+        triplets.append([id2, id1, "AbstractionOf"])
     
 
 df = pd.DataFrame(data=triplets, columns=["ID1", "ID2", "Relation"])
