@@ -3,13 +3,32 @@ from typing import List, Tuple, Dict
 import torch
 from torch import Tensor
 
+def random_sample(
+    head_index: torch.Tensor, 
+    rel_type: torch.Tensor,
+    tail_index: torch.Tensor,
+    num_node: int
+) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+    num_negatives = head_index.numel() // 2
+    rnd_index = torch.randint(num_node, head_index.size(),device=head_index.device)
+    
+    head_index = head_index.clone()
+    head_index[:num_negatives] = rnd_index[:num_negatives]
+    tail_index = tail_index.clone()
+    tail_index[num_negatives:] = rnd_index[num_negatives:]
+
+    return head_index, rel_type, tail_index
+
+
 class HopTripletLoader(torch.utils.data.DataLoader):
     def __init__(
         self, 
         triplet_dict: Dict[str, torch.tensor],
         index_key : str = "edge_index",
         label_key: str = "edge_label_index",
-        neighbor_hop : int = 2,
+        neighbor_hop : int = 1,
+        add_negative_label: bool = True,
+        num_node: int = None,
         **kwargs
     ):
         
@@ -17,6 +36,11 @@ class HopTripletLoader(torch.utils.data.DataLoader):
         self.edge_index_triplets: torch.tensor = triplet_dict[index_key]
         self.node_id: torch.tensor = triplet_dict["node_id"]
         self.neighbor_hop = neighbor_hop
+        
+        self.index_key = index_key
+        self.label_key = label_key
+        self.add_negative_label = add_negative_label
+        self.num_node = num_node
 
         super().__init__(
             range(self.edge_label_index_triplet[:, 0].numel()), 
@@ -24,44 +48,122 @@ class HopTripletLoader(torch.utils.data.DataLoader):
             **kwargs
         )
     
-    def get_neighbor(
+    def _new_node_id(
+        self, 
+        neighbor_triplet: torch.tensor,
+        label_triplet: torch.tensor
+    ):
+        all_nodes = torch.concat([neighbor_triplet[:, 0], neighbor_triplet[:, 2], label_triplet[:, 0], label_triplet[:, 2]]).unique()
+        
+        sorted_nodes = all_nodes.sort()
+        
+        original_node_index = sorted_nodes.values
+        new_node_index = sorted_nodes.indices
+        
+        neighbor_head_index = torch.where(original_node_index == neighbor_triplet[:, 0].unsqueeze(dim=1))[1]
+        neighbor_tail_index = torch.where(original_node_index == neighbor_triplet[:, 2].unsqueeze(dim=1))[1]
+
+        label_head_index = torch.where(original_node_index == label_triplet[:, 0].unsqueeze(dim=1))[1]
+        label_tail_index = torch.where(original_node_index == label_triplet[:, 2].unsqueeze(dim=1))[1]
+        
+        neighbor_triplet[:, 0] = neighbor_head_index
+        neighbor_triplet[:, 2] = neighbor_tail_index
+
+        label_triplet[:, 0] = label_head_index
+        label_triplet[:, 2] = label_tail_index
+        
+        if self.add_negative_label:
+            result = {
+                "node_id": original_node_index,
+                self.index_key: neighbor_triplet,
+                self.label_key: label_triplet,
+                "positive": label_triplet[:int(len(label_triplet)/2)]    ,
+                "negative": label_triplet[int(len(label_triplet)/2):]        
+            }
+        else:
+            result = {
+                "node_id": original_node_index,
+                self.index_key: neighbor_triplet,
+                self.label_key: label_triplet   
+            }
+        
+        return result
+        
+        
+    
+    def _get_neighbor(
         self, 
         edge_label_index_triplets: torch.tensor
     ):
         neighbors = []
         def adjacent( 
-            target_node: int
+            head_index: torch.tensor,
+            tail_index: torch.tensor
         ):
-            head_adjacent = (self.edge_index_triplets[:, 0] == target_node).nonzero(as_tuple = True)[0]
-            tail_adjacent = (self.edge_index_triplets[:, 2] == target_node).nonzero(as_tuple = True)[0]
+            # [h, r, t]のhに隣接するノードを取得
+            head_adjacent_index_head = torch.isin(self.edge_index_triplets[:, 0], head_index).nonzero(as_tuple = True)[0]
+            head_adjacent_index_tail = torch.isin(self.edge_index_triplets[:, 2], head_index).nonzero(as_tuple = True)[0]
             
-            index = torch.cat([head_adjacent, tail_adjacent])
+            # [h, r, t]のtに隣接するノードを取得
+            tail_adjacent_index_head = torch.isin(self.edge_index_triplets[:, 0], tail_index).nonzero(as_tuple = True)[0]
+            tail_adjacent_index_tail = torch.isin(self.edge_index_triplets[:, 2], tail_index).nonzero(as_tuple = True)[0]
             
-            adjacent_triplet = self.edge_index_triplets[index]
+            head_adjacent_index = torch.cat([head_adjacent_index_head, head_adjacent_index_tail])
+            tail_adjacent_index = torch.cat([tail_adjacent_index_head, tail_adjacent_index_tail])
+            
+            adjacent_index = torch.cat([head_adjacent_index, tail_adjacent_index])          
+            adjacent_triplet = self.edge_index_triplets[adjacent_index]
             
             return adjacent_triplet
         
+        for i in range(self.neighbor_hop):
+            if i == 0:
+                head_index: torch.tensor = edge_label_index_triplets[:, 0]
+                tail_index: torch.tensor = edge_label_index_triplets[:, 2]
+            else:
+                head_index: torch.tensor = adjacent_triplet[:, 0]
+                tail_index: torch.tensor = adjacent_triplet[:, 2]
+            
+            adjacent_triplet = adjacent(
+                head_index=head_index,
+                tail_index=tail_index
+            )
+            
+            neighbors.append(adjacent_triplet)
         
+        neighbors = torch.cat(neighbors, dim=0).view(-1, 3).unique(dim=0)
+        
+        return neighbors
+                
              
-        
-
     def sample(self, index: List[int]) -> Tuple[Tensor, Tensor, Tensor]:
         index = torch.tensor(index, device=self.edge_label_index_triplet.device)
         edge_label_index = self.edge_label_index_triplet[index]
         
-        neighbors_triplets = self.get_neighbor(
+        if self.add_negative_label:
+            neg_head_index, neg_rel_type, neg_tail_index = random_sample(
+                head_index=edge_label_index[:, 0],
+                rel_type=edge_label_index[:, 1],
+                tail_index=edge_label_index[:, 2],
+                num_node=self.num_node
+                
+            )
+            negative_triplet = torch.stack([neg_head_index, neg_rel_type, neg_tail_index]).transpose(0, 1)
+            
+            edge_label_index = torch.cat([edge_label_index, negative_triplet])
+        
+        neighbors_triplets = self._get_neighbor(
             edge_label_index_triplets = edge_label_index
         )
         
+        result = self._new_node_id(
+            neighbor_triplet=neighbors_triplets,
+            label_triplet=edge_label_index
+        )
         
         
+        return result
         
-        
-
-        # return head_index, rel_type, tail_index
-    
-
-
 def reverse_triplet(triplets: torch.tensor):
     new_triplets = []
     for triplet in triplets:
@@ -148,11 +250,10 @@ if __name__ == "__main__":
     
     train_triples, valid_triples, test_triples = split_data(triplets=triplets)
     
-    
     loader = HopTripletLoader(
         triplet_dict=train_triples,
         neighbor_hop=2,
-        batch_size=4
+        batch_size=2
     )
     
     for triplet in loader:

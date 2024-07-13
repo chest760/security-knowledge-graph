@@ -1,120 +1,159 @@
+import math
 import torch
 from gat import GAT
 import torch.nn.functional as F
+from convkb import ConvKB
 
 class BaseLineModel2(torch.nn.Module):
     def __init__(
         self,
         structure_node_embedding: torch.tensor,
-        structure_rel_embedding: torch.tensor,
-        text_node_embedding: torch.tensor
+        text_node_embedding: torch.tensor,
+        node_num: int,
+        rel_num: int
         
     ):
         super().__init__()
-        self.encoder = Encoder(
-            structure_node_embedding = structure_node_embedding,
-            structure_rel_embedding = structure_rel_embedding,
-            text_node_embedding = text_node_embedding
-        )
-        self.decoder = Decoder()
+        self.encoder = Encoder()
+        self.decoder = Decoder(node_num=node_num, rel_num=rel_num)
         
-    
-    def forward(self, x):
-        encoded = self.encoder(x)
-        decoded = self.decoder(encoded)
-        return encoded, decoded
-        
-        
-
-class Encoder(torch.nn.Module):
-    def __init__(
-        self,
-        structure_node_embedding: torch.tensor,
-        structure_rel_embedding: torch.tensor,
-        text_node_embedding: torch.tensor
-    ):
-        super().__init__()
         self.structure_node_embedding = structure_node_embedding
-        self.structure_rel_embedding = structure_rel_embedding
+        self.structure_rel_embedding = torch.nn.Embedding(rel_num, 100)
         self.text_node_embedding = text_node_embedding
+        self.linear = torch.nn.Linear(text_node_embedding.size(1), 384)
         
-        self.linear = F.Linear(text_node_embedding.size(1), 384)
-        
+        self.node_num = node_num
+        self.rel_num  = rel_num
+
+    def reset_parameters(self):
+        bound = 6. / math.sqrt(self.node_dim)
+        torch.nn.init.uniform_(self.structure_rel_embedding, -bound, bound)
+        F.normalize(self.structure_rel_embedding.data, p=2.0, dim=-1, out=self.structure_rel_embedding.data)  
         
     def forward(
         self,
-        head_index: torch.tensor,
-        rel_type: torch.tensor,
-        tail_index: torch.tensor
-    ) -> torch.tensor:
-        text_node_embedding = self.linear(self.text_node_embedding)
-        head_index
-        pass
-    
-    def loss(
-        self,
-        head_index: torch.tensor,
-        rel_type: torch.tensor,
-        tail_index: torch.tensor,
-        neg_head_index: torch.tensor,
-        neg_rel_type: torch.tensor, 
-        neg_tail_index: torch.tensor
-    ) -> torch.tensor: 
-        pos_score = self.forward(
+        node_id: torch.tensor, 
+        head_index: torch.tensor, 
+        rel_type: torch.tensor, 
+        tail_index: torch.tensor, 
+        head_label_index: torch.tensor,
+        rel_label_type: torch.tensor, 
+        tail_label_index: torch.tensor,
+    ):
+        
+        # concat text embedding and structure embedding
+        text_emb = self.text_node_embedding[node_id]
+        structure_emb = self.structure_node_embedding[node_id]
+        
+        
+        text_emb = self.linear(text_emb) # Text Embedding size -> 384
+        x = torch.concat([structure_emb, text_emb], dim=1) # x size: 128 + 384 -> 512
+        
+        # input gat model # updated_x size: 100
+        updated_x = self.encoder.forward(
+            x=x,
             head_index=head_index,
             rel_type=rel_type,
             tail_index=tail_index
         )
         
-        neg_score = self.forward(
-            head_index=neg_head_index,
-            rel_type=neg_rel_type,
-            tail_index=neg_tail_index
+        # calcurate the score
+        encoder_score = self.encoder.calc_score(
+            x=updated_x, 
+            rel_emb=self.structure_rel_embedding,
+            head_index=head_label_index,
+            rel_type=rel_label_type,
+            tail_index=tail_label_index
         )
         
-        loss = F.margin_ranking_loss(
-            pos_score,
-            neg_score,
-            target=torch.ones_like(pos_score),
-            margin=self.margin,
+        
+        # input convKB model and calcurate score
+        decoder_score, l2 = self.decoder.forward(
+            updated_x,
+            rel_emb = self.structure_rel_embedding,
+            head_index=head_label_index,
+            rel_type=rel_label_type,
+            tail_index=tail_label_index
         )
         
-        return loss
+        return encoder_score, decoder_score, l2
+        
+        
 
-    
-    def loss(
-        self,
-        head_index: torch.tensor,
-        rel_type: torch.tensor,
-        tail_index: torch.tensor,
-        neg_head_index: torch.tensor,
-        neg_rel_type: torch.tensor,
-        neg_tail_index: torch.tensor,
-    ) -> torch.tensor:
-        pass
-
-class Decoder(torch.nn.Module):
+class Encoder(torch.nn.Module):
     def __init__(self):
-        super().__init__()
-    
+        super().__init__()        
+        self.gat = GAT(
+            in_dim=512,
+            hidden_dim=128,
+            out_dim=128,
+            num_heads=2
+        )
+        self.linear = torch.nn.Linear(128, 100)
+        
     def forward(
         self,
+        x: torch.tensor,
         head_index: torch.tensor,
         rel_type: torch.tensor,
         tail_index: torch.tensor
     ) -> torch.tensor:
-        pass
+        
+        x = self.gat.forward(
+            h=x,
+            edge_index=torch.stack([head_index, tail_index])
+        )
+        
+        x = self.linear(x)
+        return x
     
-    def loss(
-        self,
+    def calc_score(
+        self, 
+        x: torch.tensor,
+        rel_emb: torch.tensor,
         head_index: torch.tensor,
         rel_type: torch.tensor,
-        tail_index: torch.tensor,
-        neg_head_index: torch.tensor,
-        neg_rel_type: torch.tensor,
-        neg_tail_index: torch.tensor,
-    ) -> torch.tensor:
-        pass
+        tail_index: torch.tensor
+    ):
+        head_emb = x[head_index]
+        rel_emb  = rel_emb(rel_type)
+        tail_emb = x[tail_index]
+        score =  -(head_emb + rel_emb - tail_emb).norm(p=2.0, dim=-1)
+        return score
     
+
+class Decoder(torch.nn.Module):
+    def __init__(
+        self,
+        node_num: int,
+        rel_num: int
+    ):
+        super().__init__()
+        
+        self.convkb = ConvKB(
+            node_num=node_num,
+            rel_num=rel_num,
+            kernel_size=1,
+            hidden_channels=100,
+            out_channels=100
+        )
+    
+    def forward(
+        self,
+        x: torch.tensor,
+        rel_emb: torch.tensor,
+        head_index: torch.tensor,
+        rel_type: torch.tensor,
+        tail_index: torch.tensor
+    ) -> torch.tensor:
+        score, l2 = self.convkb.forward(
+            x=x,
+            rel_emb=rel_emb,
+            head_index=head_index,
+            rel_type=rel_type,
+            tail_index=tail_index
+        )
+        
+        return score, l2
     
     

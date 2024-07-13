@@ -4,10 +4,12 @@ import os
 import torch
 import pandas as pd
 from typing import Tuple
-from src.utils.triplet_loader import TripletLoader
+from src.utils.hop_triplet_loader import HopTripletLoader
 from model import BaseLineModel2
 from src.utils.static_seed import static_seed
 from sentence_bert import SentenceBert
+from typing import Dict, Any
+import torch.nn.functional as F
 
 root_path = os.path.join(os.path.dirname(__file__), "../../")
 static_seed(42)
@@ -106,112 +108,148 @@ def split_data(
     
     return train_triplets_dict, valid_triplets_dict, test_triplets_dict
 
-def triplet_loader(triplet: torch.tensor) -> TripletLoader:
-    loader = TripletLoader(
-        head_index=triplet[:, 0], 
-        rel_type=triplet[:, 1],
-        tail_index=triplet[:, 2],
-        batch_size=64,
+def triplet_loader(triplet: Dict[str, torch.tensor]) -> HopTripletLoader:
+    
+    loader = HopTripletLoader(
+        triplet_dict = triplet,
+        neighbor_hop=2,
+        add_negative_label=True,
+        num_node=node_num,
+        batch_size=32,
         shuffle=True,
     )
     
     return loader
 
-@torch.no_grad()
-def random_sample(
-    head_index: torch.Tensor, 
-    rel_type: torch.Tensor,
-    tail_index: torch.Tensor,
-    num_node: int
-) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
-    num_negatives = head_index.numel() // 2
-    rnd_index = torch.randint(num_node, head_index.size(),device=head_index.device)
-    
-    head_index = head_index.clone()
-    head_index[:num_negatives] = rnd_index[:num_negatives]
-    tail_index = tail_index.clone()
-    tail_index[num_negatives:] = rnd_index[num_negatives:]
-
-    return head_index, rel_type, tail_index
-
 def train(
     model: BaseLineModel2,
-    loader: TripletLoader
+    loader: HopTripletLoader,
+    encoder_optimizer: Any,
+    decoder_optimizer: Any
 ):
     model.train()
+    total_loss = total_examples = 0
+    for data in loader:
+        encoder_optimizer.zero_grad()
+        decoder_optimizer.zero_grad()
+        
+        edge_index = data["edge_index"].to(device)
+        edge_label_index = data["edge_label_index"].to(device)
+        node_id = data["node_id"].to(device)
+        positive_edge_index = data["positive"].to(device)
+        negative_edge_index = data["negative"].to(device)
+        
+        pos_encoder_score, pos_decoder_score, pos_l2 = model.forward(
+            node_id=node_id,
+            head_index=edge_index[:, 0],
+            rel_type=edge_index[:, 1],
+            tail_index=edge_index[:, 2],
+            head_label_index=positive_edge_index[:, 0],
+            rel_label_type=positive_edge_index[:, 1],
+            tail_label_index=positive_edge_index[:, 2]
+        )
+
+        neg_encoder_score, neg_decoder_score, neg_l2 = model.forward(
+            node_id=node_id,
+            head_index=edge_index[:, 0],
+            rel_type=edge_index[:, 1],
+            tail_index=edge_index[:, 2],
+            head_label_index=negative_edge_index[:, 0],
+            rel_label_type=negative_edge_index[:, 1],
+            tail_label_index=negative_edge_index[:, 2]
+        )
+        
+        encoder_loss = F.margin_ranking_loss(
+            pos_encoder_score,
+            neg_encoder_score,
+            target=torch.ones_like(pos_encoder_score),
+            margin=2.0,
+        )
+        
+        decoder_score = torch.cat([pos_decoder_score, neg_decoder_score])
+        y = torch.cat([torch.ones_like(pos_decoder_score), -1 * torch.ones_like(neg_decoder_score)]) 
+        l2 = (pos_l2 + neg_l2) / 2
+        
+        decoder_loss = torch.mean(F.softplus(decoder_score * y)) + 0.2 * l2
+        
+        encoder_loss.backward(retain_graph=True)
+        decoder_loss.backward(retain_graph=True)
+        encoder_optimizer.step()  
+        decoder_optimizer.step()   
+    
+    return encoder_loss, decoder_loss
 
 
 @torch.no_grad()
 def valid(
     model: BaseLineModel2,
-    loader: TripletLoader
+    loader: HopTripletLoader
 ):
     model.eval()
+    
+    return 1
 
 
 @torch.no_grad()
 def test(
     model: BaseLineModel2,
-    loader: TripletLoader
+    loader: HopTripletLoader
 ):
     model.eval()
 
 def main():    
     triplet = change_index(data=raw_dataset, triplets_df=raw_triplet)
     train_triples, valid_triples, test_triples = split_data(triplets=triplet)
-    print("######################")
-    print(train_triples)
     
     train_loader = triplet_loader(triplet=train_triples)
     valid_loader = triplet_loader(triplet=valid_triples)
     
+    # sentence_bert = SentenceBert()
+    # embs = []
+    # for series in raw_dataset.to_dict(orient="records"):
+    #     name = series["Name"] if isinstance(series["Name"], str) else ""
+    #     desciption = series["Description"] if isinstance(series["Description"], str) else ""
+    #     sentence = name + " " + desciption
+    #     emb = sentence_bert(sentence=sentence)
+    #     embs.append(emb)
         
+    # text_embedding = torch.cat(embs, dim=0)
     
-    sentence_bert = SentenceBert()
-    
-    embs = []
-    for series in raw_dataset.to_dict(orient="records"):
-        name = series["Name"] if isinstance(series["Name"], str) else ""
-        desciption = series["Description"] if isinstance(series["Description"], str) else ""
-        sentence = name + " " + desciption
-        emb = sentence_bert(sentence=sentence)
-        embs.append(emb)
-        
-        
-    text_embedding = torch.cat(embs, dim=0)
     model = BaseLineModel2(
-        structure_node_embedding=torch.randn(559, 128),
-        structure_rel_embedding=torch.randn(5, 128),
-        text_node_embedding=embs
-        
-    )
+        structure_node_embedding=torch.randn(node_num, 128).to(device),
+        text_node_embedding=torch.randn(node_num, 768).to(device),
+        node_num=node_num,
+        rel_num=rel_num
+    ).to(device)
 
-    optimizer = torch.optim.AdamW(model.parameters(), lr=1e-3)
+    encoder_optimizer = torch.optim.AdamW(model.encoder.parameters(), lr=1e-3)
+    decoder_optimizer = torch.optim.AdamW(model.decoder.parameters(), lr=1e-3)
     
     for epoch in range(1, 501):
-        train_loss = train(
+        train_encoder_loss, train_decoder_loss = train(
             loader=train_loader, 
             model=model,
-            optimizer=optimizer
+            encoder_optimizer=encoder_optimizer,
+            decoder_optimizer=decoder_optimizer
         )
         valid_loss = valid(
-            loader=valid_loader,
-            model=model
+            model=model,
+            loader=valid_loader
         )
-        print(f'Epoch: {epoch:03d}, Loss: {train_loss:.4f}, Valid_Loss: {valid_loss:.4f}')
+        print(f'Epoch: {epoch:03d}, Loss: {train_encoder_loss:.4f}, Valid_Loss: {valid_loss:.4f}')
         
-        if epoch % 30 == 0:
-            index = (test_triples[:, 1] == 1 ).nonzero(as_tuple=True)[0]
-            mean_rank, mrr, hits_at_k = test(
-                model=model,
-                head_index=test_triples[:, 0],
-                rel_type=test_triples[:, 1],
-                tail_index=test_triples[:, 2],
-                train_triples=train_triples,
-                valid_triples=valid_triples,
-                batch_size=64
-            )
-            print(f'MeanRank: {mean_rank:.4f}, MRR: {mrr:.4f}, Hits@10: {hits_at_k:.4f}')
+        # if epoch % 30 == 0:
+        #     index = (test_triples[:, 1] == 1 ).nonzero(as_tuple=True)[0]
+        #     mean_rank, mrr, hits_at_k = test(
+        #         model=model,
+        #         head_index=test_triples[:, 0],
+        #         rel_type=test_triples[:, 1],
+        #         tail_index=test_triples[:, 2],
+        #         train_triples=train_triples,
+        #         valid_triples=valid_triples,
+        #         batch_size=64
+        #     )
+        #     print(f'MeanRank: {mean_rank:.4f}, MRR: {mrr:.4f}, Hits@10: {hits_at_k:.4f}')
     
     
 main()
