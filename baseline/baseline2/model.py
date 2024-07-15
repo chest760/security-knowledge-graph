@@ -3,6 +3,9 @@ import torch
 from gat import GAT
 import torch.nn.functional as F
 from convkb import ConvKB
+from src.utils.static_seed import static_seed
+
+static_seed(42)
 
 class BaseLineModel2(torch.nn.Module):
     def __init__(
@@ -24,11 +27,13 @@ class BaseLineModel2(torch.nn.Module):
         
         self.node_num = node_num
         self.rel_num  = rel_num
+        
+        self.reset_parameters()
 
     def reset_parameters(self):
-        bound = 6. / math.sqrt(self.node_dim)
-        torch.nn.init.uniform_(self.structure_rel_embedding, -bound, bound)
-        F.normalize(self.structure_rel_embedding.data, p=2.0, dim=-1, out=self.structure_rel_embedding.data)  
+        bound = 6. / math.sqrt(100)
+        torch.nn.init.uniform_(self.structure_rel_embedding.weight, -bound, bound)
+        F.normalize(self.structure_rel_embedding.weight.data, p=2.0, dim=-1, out=self.structure_rel_embedding.weight.data)  
         
     def forward(
         self,
@@ -118,6 +123,9 @@ class Encoder(torch.nn.Module):
         head_emb = x[head_index]
         rel_emb  = rel_emb(rel_type)
         tail_emb = x[tail_index]
+        
+        head_emb = F.normalize(head_emb, p=2.0, dim=-1)
+        tail_emb = F.normalize(tail_emb, p=2.0, dim=-1)
         score =  -(head_emb + rel_emb - tail_emb).norm(p=2.0, dim=-1)
         return score
     

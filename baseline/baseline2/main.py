@@ -10,6 +10,7 @@ from src.utils.static_seed import static_seed
 from sentence_bert import SentenceBert
 from typing import Dict, Any
 import torch.nn.functional as F
+import tqdm
 
 root_path = os.path.join(os.path.dirname(__file__), "../../")
 static_seed(42)
@@ -129,7 +130,7 @@ def train(
 ):
     model.train()
     total_loss = total_examples = 0
-    for data in loader:
+    for data in tqdm.tqdm(loader):
         encoder_optimizer.zero_grad()
         decoder_optimizer.zero_grad()
         
@@ -170,7 +171,7 @@ def train(
         y = torch.cat([torch.ones_like(pos_decoder_score), -1 * torch.ones_like(neg_decoder_score)]) 
         l2 = (pos_l2 + neg_l2) / 2
         
-        decoder_loss = torch.mean(F.softplus(decoder_score * y)) + 0.2 * l2
+        decoder_loss = torch.mean(F.softplus(decoder_score * y))
         
         encoder_loss.backward(retain_graph=True)
         decoder_loss.backward(retain_graph=True)
@@ -236,7 +237,7 @@ def main():
             model=model,
             loader=valid_loader
         )
-        print(f'Epoch: {epoch:03d}, Loss: {train_encoder_loss:.4f}, Valid_Loss: {valid_loss:.4f}')
+        print(f'Epoch: {epoch:03d}, Train Encoder Loss: {train_encoder_loss:.4f}, Train Decoder Loss: {train_decoder_loss:.4f}, Valid_Loss: {valid_loss:.4f}')
         
         # if epoch % 30 == 0:
         #     index = (test_triples[:, 1] == 1 ).nonzero(as_tuple=True)[0]
