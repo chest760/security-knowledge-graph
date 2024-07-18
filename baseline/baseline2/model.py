@@ -21,8 +21,8 @@ class BaseLineModel2(torch.nn.Module):
         self.decoder = Decoder(node_num=node_num, rel_num=rel_num)
         
         self.structure_node_embedding = structure_node_embedding
-        self.structure_rel_embedding = torch.nn.Embedding(rel_num, 100)
-        self.text_node_embedding = text_node_embedding
+        self.structure_rel_embedding = torch.nn.Embedding(rel_num, 512)
+        self.text_node_embedding = torch.nn.Embedding(node_num, 512)
         self.linear = torch.nn.Linear(text_node_embedding.size(1), 384)
         
         self.node_num = node_num
@@ -31,8 +31,9 @@ class BaseLineModel2(torch.nn.Module):
         self.reset_parameters()
 
     def reset_parameters(self):
-        bound = 6. / math.sqrt(100)
+        bound = 6. / math.sqrt(512)
         torch.nn.init.uniform_(self.structure_rel_embedding.weight, -bound, bound)
+        torch.nn.init.uniform_(self.text_node_embedding.weight, -bound, bound)
         F.normalize(self.structure_rel_embedding.weight.data, p=2.0, dim=-1, out=self.structure_rel_embedding.weight.data)  
         
     def forward(
@@ -45,26 +46,27 @@ class BaseLineModel2(torch.nn.Module):
         rel_label_type: torch.tensor, 
         tail_label_index: torch.tensor,
     ):
+        x = self.text_node_embedding(node_id)
         
-        # concat text embedding and structure embedding
-        text_emb = self.text_node_embedding[node_id]
-        structure_emb = self.structure_node_embedding[node_id]
+        # # concat text embedding and structure embedding
+        # text_emb = self.text_node_embedding[node_id]
+        # structure_emb = self.structure_node_embedding[node_id]
         
         
-        text_emb = self.linear(text_emb) # Text Embedding size -> 384
-        x = torch.concat([structure_emb, text_emb], dim=1) # x size: 128 + 384 -> 512
+        # text_emb = self.linear(text_emb) # Text Embedding size -> 384
+        # x = torch.concat([structure_emb, text_emb], dim=1) # x size: 128 + 384 -> 512
         
         # input gat model # updated_x size: 100
-        updated_x = self.encoder.forward(
-            x=x,
-            head_index=head_index,
-            rel_type=rel_type,
-            tail_index=tail_index
-        )
+        # updated_x = self.encoder.forward(
+        #     x=x,
+        #     head_index=head_index,
+        #     rel_type=rel_type,
+        #     tail_index=tail_index
+        # )
         
         # calcurate the score
         encoder_score = self.encoder.calc_score(
-            x=updated_x, 
+            x=x, 
             rel_emb=self.structure_rel_embedding,
             head_index=head_label_index,
             rel_type=rel_label_type,
@@ -74,7 +76,7 @@ class BaseLineModel2(torch.nn.Module):
         
         # input convKB model and calcurate score
         decoder_score, l2 = self.decoder.forward(
-            updated_x,
+            x,
             rel_emb = self.structure_rel_embedding,
             head_index=head_label_index,
             rel_type=rel_label_type,
@@ -124,9 +126,9 @@ class Encoder(torch.nn.Module):
         rel_emb  = rel_emb(rel_type)
         tail_emb = x[tail_index]
         
-        head_emb = F.normalize(head_emb, p=2.0, dim=-1)
-        tail_emb = F.normalize(tail_emb, p=2.0, dim=-1)
-        score =  -(head_emb + rel_emb - tail_emb).norm(p=2.0, dim=-1)
+        # head_emb = F.normalize(head_emb, p=2.0, dim=-1)
+        # tail_emb = F.normalize(tail_emb, p=2.0, dim=-1)
+        score =  - (head_emb + rel_emb - tail_emb).norm(p=2.0, dim=-1)
         return score
     
 
@@ -142,7 +144,7 @@ class Decoder(torch.nn.Module):
             node_num=node_num,
             rel_num=rel_num,
             kernel_size=1,
-            hidden_channels=100,
+            hidden_channels=512,
             out_channels=100
         )
     

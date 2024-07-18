@@ -18,9 +18,9 @@ class ConvKB(torch.nn.Module):
         self.ent_embeddings = torch.nn.Embedding(node_num, hidden_channels) 
         self.rel_embeddings = torch.nn.Embedding(rel_num, hidden_channels)
 
-        self.conv1_bn = torch.nn.BatchNorm2d(1)
-        self.conv_layer = torch.nn.Conv2d(1, out_channels, (kernel_size, 3))
-        self.conv2_bn = torch.nn.BatchNorm2d(out_channels)
+        self.conv1_bn = torch.nn.BatchNorm1d(3)
+        self.conv_layer = torch.nn.Conv1d(3, out_channels, kernel_size)
+        self.conv2_bn = torch.nn.BatchNorm1d(out_channels)
         self.dropout = torch.nn.Dropout(0.3)
         self.non_linearity = torch.nn.ReLU()
         self.fc_layer = torch.nn.Linear((hidden_channels - kernel_size + 1) * out_channels, 1, bias=False)
@@ -41,8 +41,8 @@ class ConvKB(torch.nn.Module):
         t = t.unsqueeze(1)
     
         conv_input = torch.cat([h, r, t], 1) 
-        conv_input = conv_input.transpose(1, 2)
-        conv_input = conv_input.unsqueeze(1)
+        # conv_input = conv_input.transpose(1, 2)
+        # conv_input = conv_input.unsqueeze(1)
         conv_input = self.conv1_bn(conv_input)
         out_conv = self.conv_layer(conv_input)
         out_conv = self.conv2_bn(out_conv)
@@ -51,7 +51,7 @@ class ConvKB(torch.nn.Module):
         input_fc = self.dropout(out_conv)
         score = self.fc_layer(input_fc).view(-1)
 
-        return -score
+        return score
     
     
     def forward(
@@ -68,10 +68,10 @@ class ConvKB(torch.nn.Module):
         score = self._calc_score(h, r, t)
         
         # regularization
-        l2_reg = torch.mean(h ** 2) + torch.mean(t ** 2) + torch.mean(r ** 2)
+        l2_reg = 0
         for W in self.conv_layer.parameters():
-            l2_reg = l2_reg + W.norm(2)
+            l2_reg = l2_reg + W.norm(p=2.0) ** 2
         for W in self.fc_layer.parameters():
-            l2_reg = l2_reg + W.norm(2)
+            l2_reg = l2_reg + W.norm(p=2.0) ** 2
         
         return score, l2_reg
