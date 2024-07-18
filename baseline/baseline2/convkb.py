@@ -21,7 +21,7 @@ class ConvKB(torch.nn.Module):
         self.conv1_bn = torch.nn.BatchNorm1d(3)
         self.conv_layer = torch.nn.Conv1d(3, out_channels, kernel_size)
         self.conv2_bn = torch.nn.BatchNorm1d(out_channels)
-        self.dropout = torch.nn.Dropout(0.3)
+        self.dropout = torch.nn.Dropout(0.2)
         self.non_linearity = torch.nn.ReLU()
         self.fc_layer = torch.nn.Linear((hidden_channels - kernel_size + 1) * out_channels, 1, bias=False)
     

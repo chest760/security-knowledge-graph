@@ -1,18 +1,17 @@
 import sys # noqa
 sys.path.append("../../") # noqa
 import os
+import tqdm
 import torch
 import pandas as pd
 from typing import Tuple
-from src.utils.hop_triplet_loader import HopTripletLoader
-from model import BaseLineModel2
-from src.utils.static_seed import static_seed
-from sentence_bert import SentenceBert
-from typing import Dict, Any
-import torch.nn.functional as F
-import tqdm
 from encoder import Encoder
 from decoder import Decoder
+from typing import Dict, Any
+import torch.nn.functional as F
+from sentence_bert import SentenceBert
+from src.utils.static_seed import static_seed
+from src.utils.hop_triplet_loader import HopTripletLoader
 
 root_path = os.path.join(os.path.dirname(__file__), "../../")
 static_seed(42)
@@ -30,8 +29,8 @@ relations = [
         "AbstractionOf"
     ]
 
-raw_triplet = pd.read_csv(f"{root_path}/data/processed/triplet.csv")
-raw_dataset = pd.read_csv(f"{root_path}/data/processed/dataset.csv")
+raw_triplet = pd.read_csv(f"{root_path}/data/processed/triplet.csv")[:722]
+raw_dataset = pd.read_csv(f"{root_path}/data/processed/dataset.csv")[:559]
 
 node_num = len(raw_dataset)
 rel_num = len(relations)
@@ -112,16 +111,14 @@ def split_data(
     return train_triplets_dict, valid_triplets_dict, test_triplets_dict
 
 def triplet_loader(triplet: Dict[str, torch.tensor]) -> HopTripletLoader:
-    
     loader = HopTripletLoader(
         triplet_dict = triplet,
         neighbor_hop=2,
         add_negative_label=True,
         num_node=node_num,
-        batch_size=128,
+        batch_size=32,
         shuffle=True,
     )
-    
     return loader
 
 def train(
@@ -171,9 +168,9 @@ def train(
         
         
         encoder_loss.backward(retain_graph=True)
-        # decoder_loss.backward(retain_graph=True)
+        decoder_loss.backward(retain_graph=True)
         encoder_optimizer.step()  
-        # decoder_optimizer.step()
+        decoder_optimizer.step()
         
         total_encoder_loss += float(encoder_loss) * positive_edge_index[:, 0].numel()
         total_decoder_loss += float(decoder_loss) * positive_edge_index[:, 0].numel()
@@ -277,7 +274,6 @@ def test(
                 ts.to(device)
             )
         
-            
             # score, _ = decoder.forward(
             #     x=x,
             #     rel_emb=rel_embedding,
@@ -336,8 +332,8 @@ def main():
         out_channels=128
     ).to(device)
     
-    encoder_optimizer = torch.optim.Adam(encoder.parameters(), lr=2e-3)
-    decoder_optimizer = torch.optim.Adam(decoder.parameters(), lr=2e-3)
+    encoder_optimizer = torch.optim.Adam(encoder.parameters(), lr=2e-4)
+    decoder_optimizer = torch.optim.Adam(decoder.parameters(), lr=2e-4)
     
     for epoch in range(1, 721):
         train_encoder_loss, train_decoder_loss = train(
@@ -354,7 +350,7 @@ def main():
         )
         print(f'Epoch: {epoch:03d}, Train Encoder Loss: {train_encoder_loss:.4f}, Train Decoder Loss: {train_decoder_loss:.4f}, Valid Encoder Loss: {valid_encoder_loss:.4f}, Valid Decoder Loss: {valid_decoder_loss:.4f},')
         
-        if epoch % 30 == 0:
+        if epoch % 20 == 0:
             mean_rank, mrr, hits_at_k = test(
                 encoder=encoder,
                 decoder=decoder,

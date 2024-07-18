@@ -19,7 +19,7 @@ class Encoder(torch.nn.Module):
         self.structure_embedding = structure_embedding
         self.rel_embedding = torch.nn.Embedding(rel_num, 128)
         self.linear = torch.nn.Linear(text_embedding.size(1), 512)
-        self.linear1 = torch.nn.Linear(512, 128)
+        # self.linear1 = torch.nn.Linear(512, 128)
         
         self.gat = GAT(
             in_dim=512,
@@ -68,14 +68,12 @@ class Encoder(torch.nn.Module):
         
         edge_index = torch.stack([head_index, tail_index])
         
-        # updated_x = self.gat(
-        #     h=x,
-        #     edge_index=edge_index
-        # )
-        
-        updated_x = self.linear1(x)
-        
-        return updated_x, self.rel_embedding
+        x = self.gat(
+            h=x,
+            edge_index=edge_index
+        )
+                
+        return x, self.rel_embedding
     
     def loss(
         self,
