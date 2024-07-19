@@ -2,6 +2,7 @@ from typing import List, Tuple, Dict
 
 import torch
 from torch import Tensor
+from src.utils.static_seed import static_seed
 
 def random_sample(
     head_index: torch.Tensor, 
@@ -139,7 +140,7 @@ class HopTripletLoader(torch.utils.data.DataLoader):
     def sample(self, index: List[int]) -> Tuple[Tensor, Tensor, Tensor]:
         index = torch.tensor(index, device=self.edge_label_index_triplet.device)
         edge_label_index = self.edge_label_index_triplet[index]
-        
+                
         if self.add_negative_label:
             neg_head_index, neg_rel_type, neg_tail_index = random_sample(
                 head_index=edge_label_index[:, 0],
