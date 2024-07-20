@@ -20,6 +20,7 @@ class Clustering:
         data: pd.DataFrame
     ) -> None:
         self.data = data
+        print(self.data)
         embs = self.get_embedding()
         x = embs.detach().numpy().copy() # (3529, 1024)
         self.pca = PCA(n_components=2, random_state=42)
@@ -90,14 +91,14 @@ class Clustering:
         dendrogram(Z)
         plt.title('Dendrogram')
         plt.ylabel('Euclidean distance')
-        plt.savefig("./c.png")
+        plt.savefig("./a.png")
 
-        num_clusters = 10
+        num_clusters = 14
         clusters = fcluster(Z, num_clusters, criterion='maxclust')
 
         # クラスタリング結果のプロット
         plt.figure(figsize=(10, 8))
-        colors = ['red', 'green', 'blue', 'yellow', 'pink', 'gold', 'magenta', 'orange', 'aqua', 'violet']
+        colors = ['red', 'green', 'blue', 'yellow', 'pink', 'gold', 'magenta', 'orange', 'aqua', 'violet', 'lavender', 'tan', 'peru', 'palegreen', 'deepskyblue']
         for i in range(1, num_clusters+1):
             plt.scatter(self.x[clusters == i, 0], self.x[clusters == i, 1], color=colors[i-1], label=f'Cluster {i}')
 
@@ -105,11 +106,11 @@ class Clustering:
         plt.xlabel('Feature 1')
         plt.ylabel('Feature 2')
         plt.legend()
-        plt.savefig("./d.png")
+        plt.savefig("./b.png")
         
         
         
     
 if __name__ == "__main__":
-    data = pd.read_csv(f"{root_path}/data/processed/dataset_voyage.csv")[:559]
+    data = pd.read_csv(f"{root_path}/data/processed/dataset_voyage.csv")[559:1497]
     Clustering(data)
