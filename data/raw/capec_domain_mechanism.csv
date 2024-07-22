@@ -1,0 +1,560 @@
+,ID,Domain,Mechanism,
+0,1,"Software, Hardware",Subvert Access Control
+1,10,Software,Manipulate Data Structures
+2,100,Software,Manipulate Data Structures
+3,101,Software,Inject Unexpected Items
+4,102,Software,Subvert Access Control
+5,103,"Software, Social Engineering",Engage in Deceptive Interactions
+6,104,Software,Subvert Access Control
+7,105,"Software, Communications",Abuse Existing Functionality
+8,107,Software,Subvert Access Control
+9,108,Software,Inject Unexpected Items
+10,109,Software,Inject Unexpected Items
+11,11,Software,Manipulate System Resources
+12,110,Software,Inject Unexpected Items
+13,111,Software,Abuse Existing Functionality
+14,112,Software,Employ Probabilistic Techniques
+15,113,"Software, Hardware",Abuse Existing Functionality
+16,114,"Software, Hardware",Subvert Access Control
+17,115,Software,Subvert Access Control
+18,116,"Software, Hardware, Supply Chain, Physical Security",Collect and Analyze Information
+19,117,"Software, Communications, Physical Security",Collect and Analyze Information
+20,12,Communications,Abuse Existing Functionality
+21,120,Software,Manipulate Data Structures
+22,121,"Software, Hardware",Abuse Existing Functionality
+23,122,"Software, Hardware",Subvert Access Control
+24,123,Software,Manipulate Data Structures
+25,124,"Software, Hardware",Manipulate Data Structures
+26,125,"Software, Communications",Abuse Existing Functionality
+27,126,Software,Manipulate Data Structures
+28,127,Software,Collect and Analyze Information
+29,128,Software,Manipulate Data Structures
+30,129,Software,Manipulate Data Structures
+31,13,Software,Subvert Access Control
+32,130,"Software, Communications",Abuse Existing Functionality
+33,131,Software,Abuse Existing Functionality
+34,132,Software,Engage in Deceptive Interactions
+35,133,Software,Abuse Existing Functionality
+36,134,Software,Inject Unexpected Items
+37,135,Software,Inject Unexpected Items
+38,136,Software,Inject Unexpected Items
+39,137,"Software, Social Engineering",Inject Unexpected Items
+40,138,Software,Inject Unexpected Items
+41,139,Software,Manipulate Data Structures
+42,14,Software,Manipulate Data Structures
+43,140,Software,Manipulate Timing and State
+44,141,Software,Manipulate System Resources
+45,142,Software,Manipulate System Resources
+46,143,Software,Collect and Analyze Information
+47,144,Software,Collect and Analyze Information
+48,145,Software,Engage in Deceptive Interactions
+49,146,Software,Manipulate System Resources
+50,147,Software,Abuse Existing Functionality
+51,148,"Software, Hardware, Communications",Engage in Deceptive Interactions
+52,149,Software,Collect and Analyze Information
+53,15,Software,Inject Unexpected Items
+54,150,"Software, Hardware, Physical Security",Collect and Analyze Information
+55,151,"Software, Hardware, Communications, Social Engineering",Engage in Deceptive Interactions
+56,153,Software,Manipulate Data Structures
+57,154,"Software, Hardware, Communications, Supply Chain, Social Engineering",Engage in Deceptive Interactions
+58,155,Software,Collect and Analyze Information
+59,157,"Software, Communications",Collect and Analyze Information
+60,158,"Software, Communications",Collect and Analyze Information
+61,159,Software,Engage in Deceptive Interactions
+62,16,Software,Employ Probabilistic Techniques
+63,160,Software,Abuse Existing Functionality
+64,161,"Software, Hardware, Communications",Manipulate System Resources
+65,162,Software,Subvert Access Control
+66,163,Social Engineering,Engage in Deceptive Interactions
+67,164,Social Engineering,Engage in Deceptive Interactions
+68,165,Software,Manipulate System Resources
+69,166,"Software, Hardware",Manipulate System Resources
+70,167,"Software, Hardware, Physical Security",Collect and Analyze Information
+71,168,Software,Manipulate System Resources
+72,169,"Software, Communications",Collect and Analyze Information
+73,17,Software,Subvert Access Control
+74,170,Software,Collect and Analyze Information
+75,173,"Software, Social Engineering",Engage in Deceptive Interactions
+76,174,Software,Inject Unexpected Items
+77,175,Software,Inject Unexpected Items
+78,176,"Software, Hardware, Supply Chain",Manipulate System Resources
+79,177,Software,Subvert Access Control
+80,178,"Software, Social Engineering",Inject Unexpected Items
+81,179,Software,Abuse Existing Functionality
+82,18,Software,Inject Unexpected Items
+83,180,"Software, Hardware",Subvert Access Control
+84,181,Software,Engage in Deceptive Interactions
+85,182,"Software, Social Engineering",Inject Unexpected Items
+86,183,Software,Inject Unexpected Items
+87,184,"Software, Supply Chain, Social Engineering",Manipulate System Resources
+88,185,Software,Manipulate System Resources
+89,186,"Software, Supply Chain, Social Engineering",Manipulate System Resources
+90,187,"Software, Supply Chain",Manipulate System Resources
+91,188,"Software, Hardware, Physical Security",Collect and Analyze Information
+92,189,"Software, Hardware, Physical Security",Collect and Analyze Information
+93,19,Software,Inject Unexpected Items
+94,190,"Software, Physical Security",Collect and Analyze Information
+95,191,"Software, Physical Security",Collect and Analyze Information
+96,192,"Hardware, Communications",Collect and Analyze Information
+97,193,Software,Inject Unexpected Items
+98,194,"Software, Hardware, Social Engineering",Engage in Deceptive Interactions
+99,195,"Communications, Social Engineering",Engage in Deceptive Interactions
+100,196,Software,Subvert Access Control
+101,197,Software,Abuse Existing Functionality
+102,198,Software,Inject Unexpected Items
+103,199,Software,Inject Unexpected Items
+104,2,Software,Abuse Existing Functionality
+105,20,Software,Employ Probabilistic Techniques
+106,200,Software,Subvert Access Control
+107,201,"Software, Communications","Abuse Existing Functionality, Subvert Access Control"
+108,202,Software,Subvert Access Control
+109,203,Software,Manipulate System Resources
+110,204,"Software, Hardware, Physical Security",Collect and Analyze Information
+111,206,"Software, Supply Chain",Manipulate System Resources
+112,207,Software,Subvert Access Control
+113,208,Software,Subvert Access Control
+114,209,Software,Inject Unexpected Items
+115,21,Software,Subvert Access Control
+116,212,"Software, Hardware",Abuse Existing Functionality
+117,215,Software,"Employ Probabilistic Techniques, Collect and Analyze Information"
+118,216,Communications,Abuse Existing Functionality
+119,217,Communications,Abuse Existing Functionality
+120,218,Software,Engage in Deceptive Interactions
+121,219,"Software, Communications",Subvert Access Control
+122,22,"Software, Communications",Subvert Access Control
+123,220,"Software, Communications",Abuse Existing Functionality
+124,221,"Software, Communications",Abuse Existing Functionality
+125,222,Software,Engage in Deceptive Interactions
+126,224,Software,Collect and Analyze Information
+127,226,Software,Subvert Access Control
+128,227,Software,Abuse Existing Functionality
+129,228,Software,Inject Unexpected Items
+130,229,Software,Abuse Existing Functionality
+131,23,Software,Inject Unexpected Items
+132,230,Software,Abuse Existing Functionality
+133,231,Software,Abuse Existing Functionality
+134,233,"Software, Hardware",Subvert Access Control
+135,234,Software,Subvert Access Control
+136,237,Software,Subvert Access Control
+137,24,Software,Manipulate Data Structures
+138,240,"Software, Communications",Inject Unexpected Items
+139,242,Software,Inject Unexpected Items
+140,243,Software,Inject Unexpected Items
+141,244,Software,Inject Unexpected Items
+142,245,Software,Inject Unexpected Items
+143,247,Software,Inject Unexpected Items
+144,248,Software,Inject Unexpected Items
+145,25,Software,Manipulate Timing and State
+146,250,Software,Inject Unexpected Items
+147,251,Software,Inject Unexpected Items
+148,252,Software,Inject Unexpected Items
+149,253,Software,Inject Unexpected Items
+150,256,Software,Manipulate Data Structures
+151,26,"Software, Hardware",Manipulate Timing and State
+152,261,Software,Collect and Analyze Information
+153,263,Software,Subvert Access Control
+154,267,Software,Manipulate Data Structures
+155,268,Software,Manipulate System Resources
+156,27,Software,Manipulate Timing and State
+157,270,Software,Manipulate System Resources
+158,271,Software,Manipulate System Resources
+159,272,"Software, Communications",Abuse Existing Functionality
+160,273,"Software, Communications",Abuse Existing Functionality
+161,274,Software,Abuse Existing Functionality
+162,275,Software,Engage in Deceptive Interactions
+163,276,"Software, Communications",Abuse Existing Functionality
+164,277,"Software, Communications",Abuse Existing Functionality
+165,278,"Software, Communications",Abuse Existing Functionality
+166,279,"Software, Communications",Abuse Existing Functionality
+167,28,Software,Employ Probabilistic Techniques
+168,285,Software,Collect and Analyze Information
+169,287,"Software, Communications",Collect and Analyze Information
+170,29,Software,Manipulate Timing and State
+171,290,Software,Collect and Analyze Information
+172,291,Software,Collect and Analyze Information
+173,292,"Software, Communications",Collect and Analyze Information
+174,293,Software,Collect and Analyze Information
+175,294,Software,Collect and Analyze Information
+176,295,Software,Collect and Analyze Information
+177,296,Software,Collect and Analyze Information
+178,297,Software,Collect and Analyze Information
+179,298,Software,Collect and Analyze Information
+180,299,Software,Collect and Analyze Information
+181,3,Software,Manipulate Data Structures
+182,30,Software,Subvert Access Control
+183,300,"Software, Communications",Collect and Analyze Information
+184,301,"Software, Communications",Collect and Analyze Information
+185,302,"Software, Communications",Collect and Analyze Information
+186,303,"Software, Communications",Collect and Analyze Information
+187,304,"Software, Communications",Collect and Analyze Information
+188,305,"Software, Communications",Collect and Analyze Information
+189,306,"Software, Communications",Collect and Analyze Information
+190,307,"Software, Communications",Collect and Analyze Information
+191,308,"Software, Communications",Collect and Analyze Information
+192,309,Software,Collect and Analyze Information
+193,31,Communications,"Collect and Analyze Information, Subvert Access Control"
+194,310,Software,Collect and Analyze Information
+195,312,Software,Collect and Analyze Information
+196,313,Software,Collect and Analyze Information
+197,317,Software,Collect and Analyze Information
+198,318,Software,Collect and Analyze Information
+199,319,Software,Collect and Analyze Information
+200,32,Software,Inject Unexpected Items
+201,320,Software,Collect and Analyze Information
+202,321,Software,Collect and Analyze Information
+203,322,Software,Collect and Analyze Information
+204,323,Software,Collect and Analyze Information
+205,324,Software,Collect and Analyze Information
+206,325,Software,Collect and Analyze Information
+207,326,Software,Collect and Analyze Information
+208,327,Software,Collect and Analyze Information
+209,328,Software,Collect and Analyze Information
+210,329,Software,Collect and Analyze Information
+211,33,"Software, Communications",Abuse Existing Functionality
+212,330,Software,Collect and Analyze Information
+213,331,Software,Collect and Analyze Information
+214,332,Software,Collect and Analyze Information
+215,34,"Software, Communications",Abuse Existing Functionality
+216,35,Software,Manipulate System Resources
+217,36,"Software, Hardware",Abuse Existing Functionality
+218,37,"Software, Hardware, Physical Security",Collect and Analyze Information
+219,38,Software,Engage in Deceptive Interactions
+220,383,"Software, Social Engineering","Engage in Deceptive Interactions, Collect and Analyze Information"
+221,384,"Software, Communications",Subvert Access Control
+222,385,"Software, Communications",Subvert Access Control
+223,386,"Software, Communications",Subvert Access Control
+224,387,"Software, Communications",Subvert Access Control
+225,388,"Software, Communications",Subvert Access Control
+226,389,"Software, Communications",Subvert Access Control
+227,39,Software,Subvert Access Control
+228,390,Physical Security,Subvert Access Control
+229,391,Physical Security,Subvert Access Control
+230,392,Physical Security,Subvert Access Control
+231,393,Physical Security,Subvert Access Control
+232,394,Physical Security,Subvert Access Control
+233,395,Physical Security,Subvert Access Control
+234,397,Physical Security,Subvert Access Control
+235,398,Physical Security,Subvert Access Control
+236,399,Physical Security,Subvert Access Control
+237,4,Software,Manipulate Data Structures
+238,40,Software,Inject Unexpected Items
+239,400,Physical Security,Subvert Access Control
+240,401,"Hardware, Supply Chain, Physical Security",Manipulate System Resources
+241,402,"Hardware, Supply Chain, Physical Security",Manipulate System Resources
+242,406,Physical Security,Collect and Analyze Information
+243,407,"Software, Social Engineering","Engage in Deceptive Interactions, Collect and Analyze Information"
+244,41,Software,Inject Unexpected Items
+245,410,"Software, Social Engineering",Collect and Analyze Information
+246,412,Social Engineering,"Engage in Deceptive Interactions, Collect and Analyze Information"
+247,413,Social Engineering,"Engage in Deceptive Interactions, Collect and Analyze Information"
+248,414,Social Engineering,"Engage in Deceptive Interactions, Collect and Analyze Information"
+249,415,Social Engineering,"Engage in Deceptive Interactions, Collect and Analyze Information"
+250,416,Social Engineering,Engage in Deceptive Interactions
+251,417,Social Engineering,Engage in Deceptive Interactions
+252,418,Social Engineering,Engage in Deceptive Interactions
+253,42,Software,Manipulate Data Structures
+254,420,Social Engineering,Engage in Deceptive Interactions
+255,421,Social Engineering,Engage in Deceptive Interactions
+256,422,Social Engineering,Engage in Deceptive Interactions
+257,423,Social Engineering,Engage in Deceptive Interactions
+258,424,Social Engineering,Engage in Deceptive Interactions
+259,425,Social Engineering,Engage in Deceptive Interactions
+260,426,Social Engineering,Engage in Deceptive Interactions
+261,427,Social Engineering,Engage in Deceptive Interactions
+262,428,Social Engineering,Engage in Deceptive Interactions
+263,429,Social Engineering,Engage in Deceptive Interactions
+264,43,Software,Manipulate Data Structures
+265,433,Social Engineering,Engage in Deceptive Interactions
+266,434,Social Engineering,Engage in Deceptive Interactions
+267,435,Social Engineering,Engage in Deceptive Interactions
+268,438,"Software, Hardware, Supply Chain",Manipulate System Resources
+269,439,"Hardware, Supply Chain",Manipulate System Resources
+270,44,Software,"Manipulate Data Structures, Inject Unexpected Items"
+271,440,"Hardware, Supply Chain, Physical Security",Manipulate System Resources
+272,441,"Software, Hardware",Manipulate System Resources
+273,442,Software,Manipulate System Resources
+274,443,"Software, Hardware, Supply Chain",Manipulate System Resources
+275,444,"Software, Hardware, Supply Chain",Manipulate System Resources
+276,445,"Software, Supply Chain",Manipulate System Resources
+277,446,"Software, Hardware, Supply Chain",Manipulate System Resources
+278,447,"Hardware, Supply Chain",Manipulate System Resources
+279,448,Software,Manipulate System Resources
+280,45,Software,Manipulate Data Structures
+281,452,"Software, Hardware",Manipulate System Resources
+282,456,"Software, Hardware",Manipulate System Resources
+283,457,"Software, Hardware",Manipulate System Resources
+284,458,"Software, Hardware",Manipulate System Resources
+285,459,Software,Engage in Deceptive Interactions
+286,46,Software,Manipulate Data Structures
+287,460,Software,Inject Unexpected Items
+288,461,Software,Subvert Access Control
+289,462,Software,Collect and Analyze Information
+290,463,Communications,Collect and Analyze Information
+291,464,Software,Abuse Existing Functionality
+292,465,Software,Abuse Existing Functionality
+293,466,"Software, Communications",Subvert Access Control
+294,467,Software,Subvert Access Control
+295,468,Software,Inject Unexpected Items
+296,469,Software,Abuse Existing Functionality
+297,47,Software,Manipulate Data Structures
+298,470,Software,Inject Unexpected Items
+299,471,Software,Engage in Deceptive Interactions
+300,472,Software,Collect and Analyze Information
+301,473,Software,Engage in Deceptive Interactions
+302,474,Software,Engage in Deceptive Interactions
+303,475,Software,Engage in Deceptive Interactions
+304,476,Software,Engage in Deceptive Interactions
+305,477,Software,Engage in Deceptive Interactions
+306,478,Software,Manipulate System Resources
+307,479,Software,Engage in Deceptive Interactions
+308,48,Software,Abuse Existing Functionality
+309,480,Software,Subvert Access Control
+310,481,"Software, Communications",Manipulate System Resources
+311,482,"Software, Communications",Abuse Existing Functionality
+312,485,Software,Engage in Deceptive Interactions
+313,486,"Software, Communications",Abuse Existing Functionality
+314,487,"Software, Communications",Abuse Existing Functionality
+315,488,"Software, Communications",Abuse Existing Functionality
+316,489,"Software, Communications",Abuse Existing Functionality
+317,49,Software,Employ Probabilistic Techniques
+318,490,Software,Abuse Existing Functionality
+319,491,Software,Abuse Existing Functionality
+320,492,Software,Abuse Existing Functionality
+321,493,Software,Abuse Existing Functionality
+322,494,"Software, Communications",Abuse Existing Functionality
+323,495,"Software, Communications",Abuse Existing Functionality
+324,496,"Software, Communications",Abuse Existing Functionality
+325,497,Software,Collect and Analyze Information
+326,498,Software,Collect and Analyze Information
+327,499,Software,Collect and Analyze Information
+328,5,"Software, Communications",Abuse Existing Functionality
+329,50,Software,Abuse Existing Functionality
+330,500,Software,Inject Unexpected Items
+331,501,Software,"Engage in Deceptive Interactions, Collect and Analyze Information"
+332,502,Software,Engage in Deceptive Interactions
+333,503,Software,Subvert Access Control
+334,504,Software,Engage in Deceptive Interactions
+335,505,Social Engineering,Engage in Deceptive Interactions
+336,506,Software,Engage in Deceptive Interactions
+337,507,Physical Security,Subvert Access Control
+338,508,Physical Security,Collect and Analyze Information
+339,509,Software,Subvert Access Control
+340,51,Software,Manipulate System Resources
+341,510,Software,Subvert Access Control
+342,511,Supply Chain,Manipulate System Resources
+343,516,"Hardware, Supply Chain",Manipulate System Resources
+344,517,Supply Chain,Manipulate System Resources
+345,518,Supply Chain,Manipulate System Resources
+346,519,Supply Chain,Manipulate System Resources
+347,52,Software,Manipulate Data Structures
+348,520,Supply Chain,Manipulate System Resources
+349,521,"Hardware, Supply Chain",Manipulate System Resources
+350,522,"Hardware, Supply Chain",Manipulate System Resources
+351,523,Supply Chain,Manipulate System Resources
+352,524,Supply Chain,Manipulate System Resources
+353,528,Software,Abuse Existing Functionality
+354,529,Software,Collect and Analyze Information
+355,53,Software,Manipulate Data Structures
+356,530,"Hardware, Supply Chain, Physical Security",Manipulate System Resources
+357,531,"Hardware, Supply Chain, Physical Security",Manipulate System Resources
+358,532,"Software, Supply Chain",Manipulate System Resources
+359,533,"Software, Supply Chain, Social Engineering",Manipulate System Resources
+360,534,"Hardware, Supply Chain, Physical Security",Manipulate System Resources
+361,535,"Hardware, Supply Chain, Physical Security",Manipulate System Resources
+362,536,"Software, Supply Chain",Manipulate System Resources
+363,537,"Hardware, Supply Chain",Manipulate System Resources
+364,538,Software,Manipulate System Resources
+365,539,"Hardware, Supply Chain",Manipulate System Resources
+366,54,Software,Collect and Analyze Information
+367,540,Software,Manipulate Data Structures
+368,541,Software,Collect and Analyze Information
+369,542,Software,Inject Unexpected Items
+370,543,Social Engineering,Engage in Deceptive Interactions
+371,544,Social Engineering,Engage in Deceptive Interactions
+372,545,"Software, Hardware",Collect and Analyze Information
+373,546,"Software, Hardware",Collect and Analyze Information
+374,547,Physical Security,Manipulate System Resources
+375,548,"Software, Hardware",Manipulate System Resources
+376,549,Software,Inject Unexpected Items
+377,55,Software,Employ Probabilistic Techniques
+378,550,Software,Inject Unexpected Items
+379,551,Software,Inject Unexpected Items
+380,552,Software,Inject Unexpected Items
+381,554,Software,Abuse Existing Functionality
+382,555,Software,Subvert Access Control
+383,556,Software,Inject Unexpected Items
+384,558,Software,Inject Unexpected Items
+385,559,Communications,Manipulate System Resources
+386,560,"Software, Hardware",Subvert Access Control
+387,561,Software,Subvert Access Control
+388,562,Software,Subvert Access Control
+389,563,Software,Subvert Access Control
+390,564,Software,Inject Unexpected Items
+391,565,Software,Employ Probabilistic Techniques
+392,568,Software,Collect and Analyze Information
+393,569,Software,Collect and Analyze Information
+394,57,"Software, Communications",Collect and Analyze Information
+395,571,"Software, Communications",Manipulate System Resources
+396,572,Software,Manipulate System Resources
+397,573,Software,Collect and Analyze Information
+398,574,Software,Collect and Analyze Information
+399,575,Software,Collect and Analyze Information
+400,576,Software,Collect and Analyze Information
+401,577,Software,Collect and Analyze Information
+402,578,Software,Manipulate System Resources
+403,579,Software,Inject Unexpected Items
+404,58,Software,Subvert Access Control
+405,580,Software,Collect and Analyze Information
+406,581,Software,Collect and Analyze Information
+407,582,"Software, Hardware, Communications, Social Engineering",Manipulate System Resources
+408,583,Hardware,Manipulate System Resources
+409,584,"Software, Communications",Manipulate System Resources
+410,585,Social Engineering,Manipulate System Resources
+411,586,Software,Inject Unexpected Items
+412,587,"Software, Social Engineering",Engage in Deceptive Interactions
+413,588,Software,Inject Unexpected Items
+414,589,"Software, Communications",Manipulate System Resources
+415,59,Software,Subvert Access Control
+416,590,"Software, Communications",Manipulate System Resources
+417,591,Software,Inject Unexpected Items
+418,592,Software,Inject Unexpected Items
+419,593,Software,Subvert Access Control
+420,594,"Software, Communications",Inject Unexpected Items
+421,595,"Software, Communications",Inject Unexpected Items
+422,596,"Software, Communications",Inject Unexpected Items
+423,597,Software,Manipulate Data Structures
+424,598,Software,Engage in Deceptive Interactions
+425,599,Communications,Engage in Deceptive Interactions
+426,6,Software,Inject Unexpected Items
+427,60,Software,Subvert Access Control
+428,600,Software,Subvert Access Control
+429,601,Communications,Manipulate System Resources
+430,603,"Software, Communications",Manipulate System Resources
+431,604,Communications,Manipulate System Resources
+432,605,Communications,Manipulate System Resources
+433,606,Software,Abuse Existing Functionality
+434,607,"Software, Hardware, Communications, Social Engineering, Physical Security",Manipulate System Resources
+435,608,Communications,Collect and Analyze Information
+436,609,Communications,Collect and Analyze Information
+437,61,Software,Subvert Access Control
+438,610,"Software, Communications",Inject Unexpected Items
+439,611,Social Engineering,Engage in Deceptive Interactions
+440,612,"Software, Communications",Collect and Analyze Information
+441,613,"Software, Communications",Collect and Analyze Information
+442,614,Software,Manipulate System Resources
+443,615,"Software, Hardware, Communications",Engage in Deceptive Interactions
+444,616,"Software, Hardware, Communications, Supply Chain, Social Engineering",Engage in Deceptive Interactions
+445,617,"Hardware, Communications",Engage in Deceptive Interactions
+446,618,"Software, Communications",Collect and Analyze Information
+447,619,"Software, Communications",Collect and Analyze Information
+448,62,Software,Subvert Access Control
+449,620,Software,Abuse Existing Functionality
+450,621,"Software, Hardware, Physical Security",Collect and Analyze Information
+451,622,"Software, Hardware, Physical Security",Collect and Analyze Information
+452,623,"Software, Hardware, Physical Security",Collect and Analyze Information
+453,624,"Hardware, Communications",Inject Unexpected Items
+454,625,"Hardware, Communications",Inject Unexpected Items
+455,626,Physical Security,Subvert Access Control
+456,627,"Hardware, Communications",Engage in Deceptive Interactions
+457,628,Communications,Engage in Deceptive Interactions
+458,63,Software,Inject Unexpected Items
+459,630,Social Engineering,Engage in Deceptive Interactions
+460,631,Social Engineering,Engage in Deceptive Interactions
+461,632,Social Engineering,Engage in Deceptive Interactions
+462,633,"Software, Hardware",Engage in Deceptive Interactions
+463,634,"Software, Communications",Collect and Analyze Information
+464,635,Software,Manipulate System Resources
+465,636,Software,Manipulate System Resources
+466,637,Software,Collect and Analyze Information
+467,638,"Software, Hardware",Manipulate System Resources
+468,639,Software,Collect and Analyze Information
+469,64,Software,Manipulate Data Structures
+470,640,Software,Inject Unexpected Items
+471,641,Software,Engage in Deceptive Interactions
+472,642,Software,Subvert Access Control
+473,643,Software,Collect and Analyze Information
+474,644,Software,Subvert Access Control
+475,645,Software,Subvert Access Control
+476,646,Software,Collect and Analyze Information
+477,647,Software,Collect and Analyze Information
+478,648,Software,Collect and Analyze Information
+479,649,Software,Manipulate System Resources
+480,65,"Software, Communications",Collect and Analyze Information
+481,650,Software,Subvert Access Control
+482,651,"Software, Communications, Physical Security",Collect and Analyze Information
+483,652,Software,Subvert Access Control
+484,653,Software,Subvert Access Control
+485,654,Software,Engage in Deceptive Interactions
+486,655,Software,Manipulate System Resources
+487,656,Social Engineering,Engage in Deceptive Interactions
+488,657,"Software, Supply Chain",Manipulate System Resources
+489,66,Software,Inject Unexpected Items
+490,660,Software,Inject Unexpected Items
+491,661,"Software, Hardware",Abuse Existing Functionality
+492,662,"Software, Communications",Subvert Access Control
+493,663,"Software, Hardware","Manipulate System Resources, Manipulate Timing and State"
+494,664,Software,Subvert Access Control
+495,665,"Software, Communications",Abuse Existing Functionality
+496,666,"Software, Communications",Abuse Existing Functionality
+497,667,Social Engineering,Engage in Deceptive Interactions
+498,668,Software,Subvert Access Control
+499,669,"Software, Supply Chain, Social Engineering",Manipulate System Resources
+500,67,Software,"Manipulate Data Structures, Inject Unexpected Items"
+501,670,"Software, Supply Chain",Manipulate System Resources
+502,671,"Hardware, Supply Chain",Manipulate System Resources
+503,672,"Software, Hardware, Supply Chain",Manipulate System Resources
+504,673,"Software, Supply Chain",Manipulate System Resources
+505,674,"Hardware, Supply Chain",Manipulate System Resources
+506,675,"Software, Hardware, Supply Chain, Physical Security",Collect and Analyze Information
+507,676,Software,Inject Unexpected Items
+508,677,"Hardware, Supply Chain, Physical Security",Manipulate System Resources
+509,678,"Software, Hardware, Supply Chain",Manipulate System Resources
+510,679,Hardware,Subvert Access Control
+511,68,"Software, Hardware",Subvert Access Control
+512,680,Hardware,Subvert Access Control
+513,681,Hardware,Subvert Access Control
+514,682,"Software, Hardware",Abuse Existing Functionality
+515,69,Software,Subvert Access Control
+516,690,"Software, Supply Chain, Social Engineering",Engage in Deceptive Interactions
+517,691,"Software, Supply Chain, Social Engineering",Engage in Deceptive Interactions
+518,692,"Software, Supply Chain, Social Engineering",Engage in Deceptive Interactions
+519,693,"Software, Supply Chain, Social Engineering",Engage in Deceptive Interactions
+520,694,"Software, Communications",Collect and Analyze Information
+521,695,"Software, Hardware, Communications, Supply Chain, Social Engineering",Engage in Deceptive Interactions
+522,696,"Software, Hardware","Manipulate System Resources, Manipulate Timing and State"
+523,697,"Software, Hardware, Social Engineering",Engage in Deceptive Interactions
+524,698,Software,Inject Unexpected Items
+525,699,"Software, Communications, Physical Security",Collect and Analyze Information
+526,7,Software,Inject Unexpected Items
+527,70,Software,Employ Probabilistic Techniques
+528,700,"Software, Hardware, Communications",Manipulate System Resources
+529,701,"Software, Communications",Subvert Access Control
+530,702,"Software, Hardware",Subvert Access Control
+531,71,Software,Manipulate Data Structures
+532,72,Software,Manipulate Data Structures
+533,73,Software,Manipulate System Resources
+534,74,"Software, Hardware",Manipulate Timing and State
+535,75,Software,Manipulate System Resources
+536,76,Software,Manipulate Data Structures
+537,77,Software,Subvert Access Control
+538,78,Software,Manipulate Data Structures
+539,79,Software,Manipulate Data Structures
+540,8,Software,Manipulate Data Structures
+541,80,Software,Manipulate Data Structures
+542,81,Software,Manipulate System Resources
+543,83,Software,Inject Unexpected Items
+544,84,Software,Inject Unexpected Items
+545,85,Software,Collect and Analyze Information
+546,86,Software,Inject Unexpected Items
+547,87,Software,Subvert Access Control
+548,88,Software,Inject Unexpected Items
+549,89,Social Engineering,Engage in Deceptive Interactions
+550,9,Software,Manipulate Data Structures
+551,90,Communications,"Abuse Existing Functionality, Subvert Access Control"
+552,92,Software,Manipulate Data Structures
+553,93,Software,Manipulate System Resources
+554,94,"Software, Communications",Subvert Access Control
+555,95,Software,Collect and Analyze Information
+556,96,Software,Manipulate System Resources
+557,97,"Hardware, Communications",Collect and Analyze Information
+558,98,Social Engineering,Engage in Deceptive Interactions

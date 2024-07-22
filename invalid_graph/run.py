@@ -134,7 +134,7 @@ def main(
     # 閉路を調べる
     cycles = list(nx.simple_cycles(G))
     for a in cycles:
-        if len(a) < 12 and len(a) > 3:
+        if len(a) < 12 and len(a) > 2:
             print(a)
     
     cycles = list(nx.cycle_basis(G.to_undirected()))
@@ -147,8 +147,8 @@ def main(
 if __name__ == "__main__":
     capec_triplet = triplet[722:2087]
     capec_dataset = dataset[559:1497]
-    capec_triplet = triplet[:722]
-    capec_dataset = dataset[:559]
+    # capec_triplet = triplet[:722]
+    # capec_dataset = dataset[:559]
     main(
         dataset=capec_dataset,
         triplet=capec_triplet,
