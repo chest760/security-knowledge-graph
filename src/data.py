@@ -1,7 +1,9 @@
 import torch
 import pandas as pd
 from models.text_embedding.sentence_transformer import SentenceTransformer
-from models.graph_embedding.transe import transE
+from models.graph_embedding.transe import TransE
+from models.graph_embedding.transh import TransH
+from models.graph_embedding.rotate import RotatE
 from torch_geometric.data import HeteroData
 
 class CreateHeteroData:
@@ -10,7 +12,7 @@ class CreateHeteroData:
         triplet: pd.DataFrame,
         dataset: pd.DataFrame,
         text_embedding_model: SentenceTransformer,
-        graph_embedding: transE
+        graph_embedding: TransE | TransH | RotatE
     ):
         self.hetero_data = HeteroData()
         self.text_embedding_model = text_embedding_model

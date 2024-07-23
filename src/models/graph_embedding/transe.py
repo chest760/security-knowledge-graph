@@ -3,7 +3,7 @@ import torch
 import torch.nn.functional as F
 from base import GraphEmbedding
 
-class transE(GraphEmbedding):
+class TransE(GraphEmbedding):
     def __init__(self, 
                  node_num: int, 
                  relation_num: int, 
@@ -19,14 +19,16 @@ class transE(GraphEmbedding):
         
         self.margin = margin
         self.p_norm = p_norm
+        
+        self.reset_parameters()
     
     
-    def reset_parmerters(self):
+    def reset_parameters(self):
         bound = 6. / math.sqrt(self.hidden_channels)
         torch.nn.init.uniform_(self.node_emb.weight, -bound, bound)
         torch.nn.init.uniform_(self.relation_emb.weight, -bound, bound)
         F.normalize(self.relation_emb.weight.data, p=self.p_norm, dim=-1,
-                      out=self.rel_emb.weight.data)
+                      out=self.relation_emb.weight.data)
     
 
     def forward(
