@@ -1,24 +1,29 @@
 import torch
 from torch_geometric.nn import HGTConv
+import torch.nn.functional as F
 
 class HGT(torch.nn.Module):
     def __init__(
         self, 
         hidden_channels, 
         out_channels, 
-        num_heads, 
-        num_layers,
         data
     ):
         super().__init__()
         self.conv1 = HGTConv(
                         hidden_channels, 
-                        hidden_channels, 
+                        256, 
                         data.metadata(),
-                        num_heads
+                        heads=4
+                    )
+
+        self.conv2 = HGTConv(
+                        128, 
+                        out_channels, 
+                        data.metadata(),
                     )
         
-        self.linear = torch.nn.Linear(512, 128)
+        self.linear = torch.nn.Linear(256 + 1024*2, 256)
     
     def forward(
         self,
@@ -29,6 +34,14 @@ class HGT(torch.nn.Module):
             x_dict=x_dict,
             edge_index_dict=edge_index_dict,
         )
-        x_dict = { node_type: self.linear(x) for node_type, x in x_dict.items() }
+        
+        # x_dict = {node_type: F.relu(x) for node_type, x in x_dict.items() }
+
+        # x_dict = self.conv2(
+        #     x_dict=x_dict,
+        #     edge_index_dict=edge_index_dict,
+        # )
+        
+        # x_dict = { node_type: self.linear(x) for node_type, x in x_dict.items() }
         
         return x_dict

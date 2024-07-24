@@ -1,6 +1,6 @@
 import math
 import torch
-from base import GraphEmbedding
+from .base import GraphEmbedding
 import torch.nn.functional as F
 
 class RotatE(GraphEmbedding):

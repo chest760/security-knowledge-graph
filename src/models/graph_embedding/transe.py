@@ -1,7 +1,7 @@
 import math
 import torch
 import torch.nn.functional as F
-from base import GraphEmbedding
+from .base import GraphEmbedding
 
 class TransE(GraphEmbedding):
     def __init__(self, 

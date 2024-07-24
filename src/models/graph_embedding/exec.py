@@ -15,7 +15,7 @@ from utils.static_seed import static_seed
 root_path = os.path.join(os.path.dirname(__file__), "../../../")
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
-relations = ["ParentOf", "ChildOf", "CanPrecede", "CanFollow", "PeerOf", "TargetOf", "AttackOf"]
+relations = ["ParentOf", "ChildOf", "CanPrecede", "CanFollow", "PeerOf"]
  
 def change_index(data:pd.DataFrame, triplets_df: pd.DataFrame):
     mapped_id = pd.DataFrame(
