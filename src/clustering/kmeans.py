@@ -12,6 +12,7 @@ from embedding import VoyageAI
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from scipy.cluster.hierarchy import linkage, dendrogram, fcluster
+from models.graph_embedding.rotate import RotatE
 
 root_path = os.path.join(os.path.dirname(__file__), "../../")
 
@@ -27,7 +28,11 @@ class Clustering:
         self.category = categoty
         self.domain_mechanism = domain_mechanism
         
-        embs = self.get_embedding()
+        embs = self.get_graph_embedding()
+        
+        # embs = self.get_embedding()
+        
+        # embs = torch.cat([embs, embs_g], dim=1)
         
         x = embs.detach().numpy().copy() # (3529, 1024)
         # self.pca = PCA(n_components=3, random_state=42, tol=0.1)
@@ -61,6 +66,16 @@ class Clustering:
             embs.append(emb)
         
         return torch.stack(embs)
+
+    def get_graph_embedding(self):
+        model = RotatE(node_num=559, relation_num=7,hidden_channels=256, margin=2, p_norm=2)
+        model.load_state_dict(torch.load("../models/graph_embedding/kge.pth"))
+        
+        re_emb = model.node_emb.weight
+        im_emb = model.node_emb_im.weight
+        
+        return (re_emb * im_emb) / 2
+        
     
     
     def kmeans(self, n_cluster: int):

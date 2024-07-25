@@ -4,12 +4,12 @@ from abc import ABCMeta, abstractmethod
 
 class TextEmbedding(torch.nn.Module, metaclass=ABCMeta):
     
-    @abstractmethod()
+    @abstractmethod
     def __init__(self):
         super().__init__()
         pass
     
-    @abstractmethod()
+    @abstractmethod
     def forward(
         self,
         id: torch.LongTensor,

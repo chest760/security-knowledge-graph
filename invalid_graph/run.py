@@ -147,8 +147,8 @@ def main(
 if __name__ == "__main__":
     capec_triplet = triplet[722:2087]
     capec_dataset = dataset[559:1497]
-    # capec_triplet = triplet[:722]
-    # capec_dataset = dataset[:559]
+    capec_triplet = triplet[:722]
+    capec_dataset = dataset[:559]
     main(
         dataset=capec_dataset,
         triplet=capec_triplet,

@@ -1,9 +1,9 @@
 import math
 import torch
 import torch.nn.functional as F
-from base import GraphEmbedding
+from .base import GraphEmbedding
 
-class transH(GraphEmbedding):
+class TransH(GraphEmbedding):
     def __init__(
         self, 
         node_num: int, 
@@ -26,9 +26,9 @@ class transH(GraphEmbedding):
         self.p_norm = p_norm
         self.margin = margin
         
-        self.reset_parmerters()
+        self.reset_parameters()
     
-    def reset_parmerters(self):
+    def reset_parameters(self):
         bound = 6. / math.sqrt(self.hidden_channels)
         torch.nn.init.uniform_(self.node_emb.weight, -bound, bound)
         torch.nn.init.uniform_(self.relation_emb.weight, -bound, bound)
@@ -51,7 +51,7 @@ class transH(GraphEmbedding):
 
         
         d_r_emb = self.d_r_emb(rel_type)
-        w_r_rmb = F.normalize(self.w_r_emb(rel_type), p=self.p_norm, dim=-1)
+        w_r_rmb = F.normalize(self.w_r_emb(rel_type), p=self.p_norm)
         
         h_proj = head - (w_r_rmb * head).sum(dim=1).unsqueeze(dim=1) * w_r_rmb
         t_proj = tail - (w_r_rmb * tail).sum(dim=1).unsqueeze(dim=1) * w_r_rmb
@@ -59,7 +59,7 @@ class transH(GraphEmbedding):
         h_proj = F.normalize(h_proj, p=self.p_norm, dim=-1)
         t_proj = F.normalize(t_proj, p=self.p_norm, dim=-1)
         
-        score = -((h_proj + d_r_emb - t_proj ).norm(p=self.p_norm, dim=-1))**2
+        score = -((h_proj + d_r_emb - t_proj).norm(p=self.p_norm, dim=-1))
         
         return score
         
