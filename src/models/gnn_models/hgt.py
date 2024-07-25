@@ -14,7 +14,7 @@ class HGT(torch.nn.Module):
                         hidden_channels, 
                         256, 
                         data.metadata(),
-                        heads=4
+                        heads=2
                     )
 
         self.conv2 = HGTConv(
@@ -22,6 +22,8 @@ class HGT(torch.nn.Module):
                         out_channels, 
                         data.metadata(),
                     )
+        
+        self.conv1.reset_parameters()
         
         self.linear = torch.nn.Linear(256 + 1024*2, 256)
     

@@ -71,7 +71,8 @@ class CreateHeteroData:
                     for name in names:
                         category_emb += model.read_category_embedding(category=name.strip())
                 
-                    emb = torch.cat([emb, category_emb/len(names)])      
+                    emb = torch.concat([emb, category_emb])   
+                    # emb = emb + (category_emb/len(names)) 
                 
                 embs.append(emb)
         
@@ -220,7 +221,8 @@ class CreateHeteroData:
         triplet = self.change_index()
         train_triplet, valid_triplet, test_triplet = self.split_data(triplets=triplet)
         
-        embs = torch.cat([self.text_embedding, self.graph_embedding], dim=1)
+        embs = torch.cat([self.graph_embedding, self.text_embedding], dim=1)
+        # embs = self.text_embedding
         train_graph = self.make_graph(
             embs=embs,
             triplet=train_triplet
@@ -241,6 +243,7 @@ class CreateHeteroData:
             train_graph["capec", relation, "capec"].edge_index = train_graph["capec", relation, "capec"].edge_label_index
             valid_graph["capec", relation, "capec"].edge_index = train_graph["capec", relation, "capec"].edge_label_index
             test_graph["capec", relation, "capec"].edge_index = torch.concat([train_graph["capec", relation, "capec"].edge_label_index, valid_graph["capec", relation, "capec"].edge_label_index], dim=1)
+
             
         
         return train_graph, valid_graph, test_graph

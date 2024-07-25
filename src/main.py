@@ -8,6 +8,7 @@ from torch_geometric.loader import LinkNeighborLoader
 from model import Model
 from models.gnn_models.hgt import HGT
 from models.gnn_models.gat import GAT
+from models.gnn_models.rgat import RGAT
 from utils.static_seed import static_seed
 
 static_seed(42)
@@ -41,7 +42,7 @@ def graph_loader(data: HeteroData, data_type: str = "train"):
         edge_label=data['capec', 'to', 'capec'].edge_label,
         neg_sampling_ratio=0.0,
         num_neighbors=[-1] * 2,
-        batch_size=64,
+        batch_size=32,
         shuffle=True if data_type == "train" else False,
     )
     
@@ -59,8 +60,6 @@ class Execute(torch.nn.Module):
         self.train_graph = train_graph
         self.valid_graph = valid_graph
         self.test_graph = test_graph
-        
-        print(train_graph)
 
         gnn_model = HGT(
                 hidden_channels=1024*2 + 256,
@@ -70,11 +69,18 @@ class Execute(torch.nn.Module):
         
         gnn_model = GAT().to(device)
         
+        # gnn_model = RGAT(
+        #     in_channels=1024*2 + 256,
+        #     out_channels=256,
+        #     num_relations=5,
+        #     heads=1
+        # ).to(device)
+        
         self.model: Model = Model(
             gnn_model=gnn_model
         ).to(device)
         
-        self.optimizer = torch.optim.AdamW(self.model.parameters(), lr=5e-5)
+        self.optimizer = torch.optim.AdamW(self.model.parameters(), lr=2e-5)
         
     
     def init_data(self):
@@ -97,9 +103,12 @@ class Execute(torch.nn.Module):
             )
             neg_edge_label_index = torch.stack([neg_head, neg_tail])
             
+            edge_label = self.train_graph["capec", "to", "capec"].edge_label[data["capec", "to", "capec"].e_id.cpu()].to(device)
+            
             loss = self.model.loss(
                 x_dict=data.x_dict,
                 edge_index_dict=data.edge_index_dict,
+                edge_label=edge_label,
                 pos_edge_label=data["capec", "to", "capec"].edge_label,
                 pos_edge_label_index=data["capec", "to", "capec"].edge_label_index,
                 neg_edge_label_index=neg_edge_label_index,
@@ -130,9 +139,12 @@ class Execute(torch.nn.Module):
             )
             neg_edge_label_index = torch.stack([neg_head, neg_tail])
             
+            edge_label = self.train_graph["capec", "to", "capec"].edge_label[data["capec", "to", "capec"].e_id.cpu()].to(device)
+            
             loss = self.model.loss(
                 x_dict=data.x_dict,
                 edge_index_dict=data.edge_index_dict,
+                edge_label=edge_label,
                 pos_edge_label=data["capec", "to", "capec"].edge_label,
                 pos_edge_label_index=data["capec", "to", "capec"].edge_label_index,
                 neg_edge_label_index=neg_edge_label_index,
@@ -160,10 +172,12 @@ class Execute(torch.nn.Module):
 
         mean_ranks, reciprocal_ranks, hits_at_k = [], [], []
         
+        edge_label = torch.concat([self.train_graph["capec", "to", "capec"].edge_label, self.valid_graph["capec", "to", "capec"].edge_label]).to(device)
+        
         x_dict = self.model.forward(
             self.test_graph.x_dict,
             self.test_graph.edge_index_dict,
-            edge_label=self.test_graph["capec", "to", "capec"].edge_label,
+            edge_label=edge_label,
         )
         
         x = x_dict["capec"]
@@ -201,8 +215,7 @@ class Execute(torch.nn.Module):
             train_valid_edge_label,
             train_valid_edge_label_index[1]
         ]).transpose(0,1)
-        
-        print(exist_triplet.size())
+    
         
         for epoch in range(1,101):
             train_loss = self.train()

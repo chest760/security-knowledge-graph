@@ -1,13 +1,15 @@
 import math
 import torch
-from typing import Literal
+from typing import Literal, Union
 from models.gnn_models.hgt import HGT
+from models.gnn_models.gat import GAT
+from models.gnn_models.rgat import RGAT
 import torch.nn.functional as F
 
 class Model(torch.nn.Module):
     def __init__(
         self,
-        gnn_model: HGT,
+        gnn_model: Union[HGT, GAT, RGAT],
     ):
         super().__init__()
         self.gnn_model = gnn_model
@@ -35,11 +37,19 @@ class Model(torch.nn.Module):
         return score
     
     def forward(self, x_dict: dict[str, torch.tensor], edge_index_dict: dict[str, torch.tensor], edge_label: torch.tensor):
-        edge_index_dict.pop(('capec', 'to', 'capec'))
-        x_dict = self.gnn_model.forward(
-            x_dict=x_dict,
-            edge_index_dict=edge_index_dict
-        )
+        # edge_index = edge_index_dict.pop(('capec', 'to', 'capec'))
+        
+        if isinstance(self.gnn_model, (HGT, GAT)):
+            x_dict = self.gnn_model.forward(
+                x_dict=x_dict,
+                edge_index_dict=edge_index_dict
+            )
+        # elif isinstance(self.gnn_model, RGAT):
+        #     x_dict = self.gnn_model.forward(
+        #         x_dict=x_dict,
+        #         edge_index=edge_index,
+        #         edge_label=edge_label
+        #     )
                 
         return x_dict
     
@@ -47,6 +57,7 @@ class Model(torch.nn.Module):
         self,
         x_dict: dict[str, torch.tensor],
         edge_index_dict: dict[str, torch.tensor],
+        edge_label: torch.tensor,
         pos_edge_label: torch.tensor,
         pos_edge_label_index: torch.tensor,
         neg_edge_label: torch.tensor,
@@ -55,9 +66,9 @@ class Model(torch.nn.Module):
         x_dict = self.forward(
             x_dict=x_dict,
             edge_index_dict=edge_index_dict,
-            edge_label=pos_edge_label
+            edge_label=edge_label
         )
-        
+
         embs = x_dict["capec"]
         
         pos_score = self._calc_score(
@@ -79,6 +90,13 @@ class Model(torch.nn.Module):
             margin=2.0,
         )
     
+        scores = torch.cat([pos_score, neg_score], dim=0)
+
+        pos_target = torch.ones_like(pos_score)
+        neg_target = torch.zeros_like(neg_score)
+        target = torch.cat([pos_target, neg_target], dim=0)
+
+        return F.binary_cross_entropy_with_logits(scores, target)
         
         return loss
         
