@@ -21,6 +21,8 @@ relation_dict = {
     "PeerOf":4 
 }
 
+static_seed(42)
+
 root_path = os.path.join(os.path.dirname(__file__), "../")
 
 class CreateHeteroData:

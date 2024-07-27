@@ -102,6 +102,7 @@ class Execute(torch.nn.Module):
                 seed=seed
             )
             neg_edge_label_index = torch.stack([neg_head, neg_tail])
+  
             
             edge_label = self.train_graph["capec", "to", "capec"].edge_label[data["capec", "to", "capec"].e_id.cpu()].to(device)
             

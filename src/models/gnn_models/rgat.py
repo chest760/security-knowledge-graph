@@ -14,7 +14,7 @@ class RGAT(torch.nn.Module):
         
         self.conv1 =  RGATConv(
             in_channels, 
-            512, 
+            256, 
             num_relations,
             heads=heads
         )
@@ -40,12 +40,12 @@ class RGAT(torch.nn.Module):
             edge_index=edge_index,
             edge_type=edge_label
         )
-        x =  F.elu(x) 
-        x = self.conv2(
-            x=x,
-            edge_index=edge_index,
-            edge_type=edge_label
-        )
+        # x =  F.relu(x) 
+        # x = self.conv2(
+        #     x=x,
+        #     edge_index=edge_index,
+        #     edge_type=edge_label
+        # )
         
         x_dict = {"capec": x}
         

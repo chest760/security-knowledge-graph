@@ -1,6 +1,6 @@
 import torch
 from typing import Literal
-from torch_geometric.nn import GATConv, HeteroConv
+from torch_geometric.nn import GATConv, HeteroConv, GCNConv
 import torch.nn.functional as F
 
 
@@ -8,7 +8,7 @@ class GAT(torch.nn.Module):
     def __init__(self) -> None:
         super().__init__()
         
-        self.linear = torch.nn.Linear(512 * 2, 512)
+        self.linear = torch.nn.Linear(512, 300)
         
         # out -> 512
         self.conv1 = GATConv(
@@ -84,6 +84,6 @@ class GAT(torch.nn.Module):
             edge_index_dict=edge_index_dict,
         )
         
-        # x_dict = { node_type: F.elu(x) for node_type, x in x_dict.items() }
+        # x_dict = { node_type: self.linear(x) for node_type, x in x_dict.items() }
         
         return x_dict

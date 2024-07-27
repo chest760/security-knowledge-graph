@@ -18,7 +18,7 @@ class HGT(torch.nn.Module):
                     )
 
         self.conv2 = HGTConv(
-                        128, 
+                        512, 
                         out_channels, 
                         data.metadata(),
                     )

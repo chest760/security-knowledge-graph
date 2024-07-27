@@ -307,5 +307,5 @@ if __name__ == "__main__":
         test_triplet=test
     )
     
-    exe.save_model()
+    # exe.save_model()
     
