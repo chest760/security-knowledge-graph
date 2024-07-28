@@ -191,10 +191,11 @@ class Execute(torch.nn.Module):
             exist_tail = exist[exist[:,1] == r.item()][:, 2].to(device)
             tail_indices = torch.arange(559).to(device)
             tail_indices = torch.tensor(list(set(tail_indices.tolist()) - set(exist_tail.tolist()))).to(device)
+            
 
             t = (tail_indices == t).nonzero(as_tuple=True)[0].to(device)
-
-            for ts in tail_indices.split(batch_size):
+            
+            for index, ts in enumerate(tail_indices.split(batch_size)):
                 score = self.model._calc_score(x=x, edge_label_index=torch.stack([h.expand_as(ts).to(device), ts.to(device)]), edge_label=r.expand_as(ts).to(device))
                 scores.append(score)
             rank = int((torch.cat(scores).argsort(descending=True) == t).nonzero().view(-1)) + 1
@@ -205,6 +206,7 @@ class Execute(torch.nn.Module):
         mrr = float(torch.tensor(reciprocal_ranks, dtype=torch.float).mean())
         hits_at_k = int(torch.tensor(hits_at_k).sum()) / len(hits_at_k)
         return mean_rank, mrr, hits_at_k
+    
     
     
     def run(self):
@@ -221,7 +223,7 @@ class Execute(torch.nn.Module):
         for epoch in range(1,101):
             train_loss = self.train()
             valid_loss = self.valid()
-            print(f"Epoch: {epoch}, Train Loss: {train_loss}, Valid loss: {valid_loss}")
+            print(f"Epoch: {epoch}, Train Loss: {train_loss:.4f}, Valid loss: {valid_loss:.4f}")
             
             if epoch % 10 == 0:
                 k = 10
@@ -234,7 +236,7 @@ class Execute(torch.nn.Module):
                     k=k
                 )
                 print("\n###########################")
-                print(f"Mean Rank: {mean_rank}, MRR: {mrr}, Hits@{k}: {hits_k}") 
+                print(f"Mean Rank: {mean_rank:.4f}, MRR: {mrr:.4f}, Hits@{k}: {hits_k:.4f}") 
                 print("###########################\n")
             
 

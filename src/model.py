@@ -38,6 +38,7 @@ class Model(torch.nn.Module):
         
         return score
     
+    
     def forward(self, x_dict: dict[str, torch.tensor], edge_index_dict: dict[str, torch.tensor], edge_label: torch.tensor):
         # edge_index = edge_index_dict.pop(('capec', 'to', 'capec'))
         
@@ -91,12 +92,11 @@ class Model(torch.nn.Module):
         #     pos_score,
         #     neg_score,
         #     target=torch.ones_like(pos_score),
-        #     margin=3.0,
+        #     margin=1.0,
         # )
         
         # return loss
         
-    
         scores = torch.cat([pos_score, neg_score], dim=0)
 
         pos_target = torch.ones_like(pos_score)
