@@ -6,7 +6,7 @@ import pandas as pd
 from typing import Literal
 from typing import Tuple
 from models.text_embedding.sentence_transformer import SentenceTransformer
-from embedding import VoyageAI
+from embedding import VoyageAI, Word2Vec
 from models.graph_embedding.transe import TransE
 from models.graph_embedding.transh import TransH
 from models.graph_embedding.rotate import RotatE
@@ -30,12 +30,13 @@ class CreateHeteroData:
         self,
         triplet: pd.DataFrame,
         dataset: pd.DataFrame,
-        text_embedding_model: Literal["sbert", "voyage"],
+        text_embedding_model: Literal["sbert", "voyage", "word2vec"],
         graph_embedding_model: Literal["transe", "transh", "rotate"]
     ):
         self.text_embedding_model = text_embedding_model
         self.graph_embedding_model = graph_embedding_model
         self.domain_mechanism = pd.read_csv(f"{root_path}/data/raw/capec_domain_mechanism.csv")
+        self.domain_mechanism_sentence = pd.read_csv(f"{root_path}/data/raw/capec_catrgory.csv")
         self.dataset = dataset
         self.triplet = triplet
         self.relations = [
@@ -59,6 +60,16 @@ class CreateHeteroData:
                 emb = model.forward(
                     text_list=[text]
                 )
+                
+                if category:
+                    names = self.domain_mechanism[self.domain_mechanism["ID"] == int(id[5:])]["Mechanism"].item().split(",")
+                    category_emb = 0
+                    for name in names:
+                        sentence = self.domain_mechanism_sentence[self.domain_mechanism_sentence["Name"] == name]["Description"].item()
+                        category_emb += model.forward(text_list=[sentence])
+                    
+                    emb = torch.concat([emb, category_emb])   
+                    
                 embs.append(emb)
         
         elif self.text_embedding_model == "voyage":
@@ -72,6 +83,28 @@ class CreateHeteroData:
                     category_emb = 0
                     for name in names:
                         category_emb += model.read_category_embedding(category=name.strip())
+                
+                    emb = torch.concat([emb, category_emb])   
+                    # emb = emb + (category_emb/len(names)) 
+                
+                embs.append(emb)
+        
+        
+        elif self.text_embedding_model == "word2vec":
+            model =  Word2Vec()
+            for series in self.dataset.to_dict(orient="records"):
+                id = series["ID"]
+                name = series["Name"] if isinstance(series["Name"], str) else ""
+                description = series["Description"] if isinstance(series["Description"], str) else ""
+                text = name + description
+                emb = model.sentence_to_word2vec(text)
+                
+                if category:
+                    names = self.domain_mechanism[self.domain_mechanism["ID"] == int(id[5:])]["Mechanism"].item().split(",")
+                    category_emb = 0
+                    for name in names:
+                        sentence = self.domain_mechanism_sentence[self.domain_mechanism_sentence["Name"] == name]["Description"].item()
+                        category_emb += model.sentence_to_word2vec(sentence=sentence)
                 
                     emb = torch.concat([emb, category_emb])   
                     # emb = emb + (category_emb/len(names)) 

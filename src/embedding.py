@@ -2,8 +2,13 @@ import os
 import torch
 from typing import Union
 import voyageai
+import numpy as np
 import pandas as pd
 from dotenv import load_dotenv
+from gensim.models import KeyedVectors, Word2Vec
+from gensim.utils import simple_preprocess
+from nltk.corpus import stopwords
+
 
 load_dotenv()
 
@@ -68,6 +73,19 @@ class VoyageAI(Base):
             
 class OpenAI:
     pass
+
+class Word2Vec:
+    def __init__(self) -> None:
+        root_path = os.path.join(os.path.dirname(__file__), "../")
+        self.pretrained_model = KeyedVectors.load_word2vec_format(f"{root_path}/baseline/baseline1/word2vec.model", binary=True)
+
+    def sentence_to_word2vec(self, sentence):
+        words = [word for word in sentence.lower().split() if word not in stopwords.words("english")]
+        words = words[:100]
+        word_vectors = [self.pretrained_model[word].tolist() for word in words if word in self.pretrained_model]
+        while len(word_vectors) < 100:
+            word_vectors.append(np.zeros(300).tolist())
+        return word_vectors
 
 
 if __name__ == "__main__":
