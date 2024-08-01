@@ -248,7 +248,7 @@ def main():
     train_graph, valid_graph, test_graph = CreateHeteroData(
         triplet=triplet,
         dataset=dataset,
-        text_embedding_model="voyage",
+        text_embedding_model="sbert",
         graph_embedding_model="rotate"
     ).init_graph()
     

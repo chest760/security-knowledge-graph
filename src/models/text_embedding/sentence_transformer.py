@@ -1,12 +1,13 @@
 import torch
 from .base import TextEmbedding
 from transformers import AutoTokenizer, AutoModel
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 
 class SentenceTransformer(TextEmbedding):
     def __init__(self):
         super().__init__()
-        self.model = AutoModel.from_pretrained('sentence-transformers/all-mpnet-base-v2')
+        self.model = AutoModel.from_pretrained('sentence-transformers/all-mpnet-base-v2').to(device)
         self.tokenizer = AutoTokenizer.from_pretrained('sentence-transformers/all-mpnet-base-v2')
         
     def text_to_ids(
@@ -33,8 +34,8 @@ class SentenceTransformer(TextEmbedding):
         text_list: list[str]
     ):  
         result = self.text_to_ids(text_list)
-        id = result["id"]
-        mask = result["mask"]
+        id = result["id"].to(device)
+        mask = result["mask"].to(device)
         output = self.model(id, mask, output_hidden_states=True)
         return output.pooler_output
     

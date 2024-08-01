@@ -12,6 +12,7 @@ from models.graph_embedding.transh import TransH
 from models.graph_embedding.rotate import RotatE
 from torch_geometric.data import HeteroData
 from utils.static_seed import static_seed
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 relation_dict = {
     "ParentOf": 0,
@@ -36,7 +37,7 @@ class CreateHeteroData:
         self.text_embedding_model = text_embedding_model
         self.graph_embedding_model = graph_embedding_model
         self.domain_mechanism = pd.read_csv(f"{root_path}/data/raw/capec_domain_mechanism.csv")
-        self.domain_mechanism_sentence = pd.read_csv(f"{root_path}/data/raw/capec_catrgory.csv")
+        self.domain_mechanism_sentence = pd.read_csv(f"{root_path}/data/raw/capec_category.csv")
         self.dataset = dataset
         self.triplet = triplet
         self.relations = [
@@ -50,25 +51,28 @@ class CreateHeteroData:
     
     @torch.no_grad()
     def _get_text_embedding(self, category: bool):
+        print("#############")
         embs = []
         if self.text_embedding_model == "sbert":
             model = SentenceTransformer()
             for series in self.dataset.to_dict(orient="records"):
+                id = series["ID"]
                 name = series["Name"] if isinstance(series["Name"], str) else ""
                 description = series["Description"] if isinstance(series["Description"], str) else ""
                 text = name + description
                 emb = model.forward(
                     text_list=[text]
                 )
+                emb = emb[0]
                 
                 if category:
                     names = self.domain_mechanism[self.domain_mechanism["ID"] == int(id[5:])]["Mechanism"].item().split(",")
                     category_emb = 0
                     for name in names:
-                        sentence = self.domain_mechanism_sentence[self.domain_mechanism_sentence["Name"] == name]["Description"].item()
+                        sentence = self.domain_mechanism_sentence[self.domain_mechanism_sentence["Name"] == name.strip()]["Description"].item()
                         category_emb += model.forward(text_list=[sentence])
                     
-                    emb = torch.concat([emb, category_emb])   
+                    emb = torch.concat([emb, category_emb[0]])   
                     
                 embs.append(emb)
         
@@ -111,8 +115,8 @@ class CreateHeteroData:
                 
                 embs.append(emb)
         
-        
-        return torch.stack(embs)
+        print(torch.stack(embs).size())
+        return torch.stack(embs).to("cpu")
     
     @torch.no_grad()
     def _get_graph_embedding(self):
@@ -290,7 +294,7 @@ if __name__ == "__main__":
     create_data = CreateHeteroData(
         triplet=triplet,
         dataset=dataset,
-        text_embedding_model="voyage",
+        text_embedding_model="sbert",
         graph_embedding_model="rotate"
     )
     
