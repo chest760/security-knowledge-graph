@@ -13,9 +13,42 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from scipy.cluster.hierarchy import linkage, dendrogram, fcluster
 from models.graph_embedding.rotate import RotatE
+from sklearn.cluster import HDBSCAN
+import hdbscan
 
 root_path = os.path.join(os.path.dirname(__file__), "../../")
-
+colors = [
+    '#FF0000',  # Red
+    '#00FF00',  # Lime
+    '#0000FF',  # Blue
+    '#FFFF00',  # Yellow
+    '#FF00FF',  # Magenta
+    '#00FFFF',  # Cyan
+    '#800000',  # Maroon
+    '#008000',  # Green
+    '#000080',  # Navy
+    '#808000',  # Olive
+    '#800080',  # Purple
+    '#008080',  # Teal
+    '#FFA500',  # Orange
+    '#A52A2A',  # Brown
+    '#FFC0CB',  # Pink
+    '#E6E6FA',  # Lavender
+    '#FFD700',  # Gold
+    '#C0C0C0',  # Silver
+    '#228B22',  # Forest Green
+    '#4B0082',  # Indigo
+    '#FF4500',  # Orange Red
+    '#2E8B57',  # Sea Green
+    '#8A2BE2',  # Blue Violet
+    '#20B2AA',  # Light Sea Green
+    '#FF69B4',  # Hot Pink
+    '#00CED1',  # Dark Turquoise
+    '#FF1493',  # Deep Pink
+    '#00FA9A',  # Medium Spring Green
+    '#1E90FF',  # Dodger Blue
+    '#B22222',  # Fire Brick
+]
 
 class Clustering:
     def __init__(
@@ -28,9 +61,9 @@ class Clustering:
         self.category = categoty
         self.domain_mechanism = domain_mechanism
         
-        embs = self.get_graph_embedding()
+        # embs_g = self.get_graph_embedding()
         
-        # embs = self.get_embedding()
+        embs = self.get_embedding()
         
         # embs = torch.cat([embs, embs_g], dim=1)
         
@@ -44,7 +77,11 @@ class Clustering:
         
         self.x = x
         
-        self.kmeans(9)
+        # self.kmeans(8)
+        
+        self.hierarchy()
+        
+        # self.hdbscan()
     
     def get_embedding(self) -> torch.tensor:
         client = VoyageAI()
@@ -54,27 +91,28 @@ class Clustering:
             emb = client.read_embedding(id=id)
             
             # id = int(id[5:])
-            # names = self.domain_mechanism[self.domain_mechanism["ID"] == id]["Mechanism"].item().split(",")
-            # # names.extend(self.domain_mechanism[self.domain_mechanism["ID"] == id]["Mechanism"].item().split(","))
+            # names = []
+            # # names = self.domain_mechanism[self.domain_mechanism["ID"] == id]["Mechanism"].item().split(",")
+            # names.extend(self.domain_mechanism[self.domain_mechanism["ID"] == id]["Mechanism"].item().split(","))
             
             # category_emb = 0
             # for name in names:
             #     category_emb += client.read_category_embedding(category=name.strip())
             
-            # emb = torch.cat([emb, 0.5*category_emb/len(names)])
+            # emb = torch.cat([emb, category_emb])
             
             embs.append(emb)
         
         return torch.stack(embs)
 
     def get_graph_embedding(self):
-        model = RotatE(node_num=559, relation_num=7,hidden_channels=256, margin=2, p_norm=2)
+        model = RotatE(node_num=559, relation_num=5,hidden_channels=256, margin=2, p_norm=2)
         model.load_state_dict(torch.load("../models/graph_embedding/kge.pth"))
         
         re_emb = model.node_emb.weight
         im_emb = model.node_emb_im.weight
         
-        return (re_emb * im_emb) / 2
+        return re_emb + im_emb
         
     
     
@@ -84,6 +122,8 @@ class Clustering:
     
         labels = kmeans.labels_
         centers = kmeans.cluster_centers_
+        
+        print(labels)
     
         fig = plt.figure(figsize=(10, 8))
         ax = fig.add_subplot(111)
@@ -111,18 +151,23 @@ class Clustering:
         
         # デンドログラムの表示
         plt.figure(figsize=(50, 50))
-        dendrogram(Z)
+        dendrogram(Z, labels=self.data["ID"].tolist())
         plt.title('Dendrogram')
         plt.ylabel('Euclidean distance')
         plt.savefig("./a.png")
 
-        num_clusters = 9
+        num_clusters = 15
         clusters = fcluster(Z, num_clusters, criterion='maxclust')
 
         # クラスタリング結果のプロット
         plt.figure(figsize=(10, 8))
-        colors = ['red', 'green', 'blue', 'yellow', 'pink', 'gold', 'magenta', 'orange', 'aqua', 'violet', 'lavender', 'tan', 'peru', 'palegreen', 'deepskyblue']
+        # colors = ['red', 'green', 'blue', 'yellow', 'pink', 'gold', 'magenta', 'orange', 'aqua', 'violet', 'lavender', 'tan', 'peru', 'palegreen', 'deepskyblue']
+        dic = {
+            i + 1: [] for i in range(num_clusters)
+        }
         for i in range(1, num_clusters+1):
+            l = [i for i, x in enumerate(clusters == i) if x]
+            dic[i] = l
             plt.scatter(self.x[clusters == i, 0], self.x[clusters == i, 1], color=colors[i-1], label=f'Cluster {i}')
 
         plt.title('Hierarchical Clustering Results')
@@ -130,6 +175,43 @@ class Clustering:
         plt.ylabel('Feature 2')
         plt.legend()
         plt.savefig("./b.png")
+        
+        print(dic)
+    
+    def hdbscan(self):
+        # HDBSCANモデルを作成し、フィッティング
+        clusterer = hdbscan.HDBSCAN(min_cluster_size=20, min_samples=1)
+        cluster_labels = clusterer.fit_predict(self.x)
+        
+        # clusterer.single_linkage_tree_.plot(cmap='viridis', colorbar=True)
+        # plt.savefig("./d.png")
+        
+        label_num = len(set(cluster_labels))
+
+        # 結果をプロット
+        plt.figure(figsize=(10, 7))
+        for i in range(label_num):
+            plt.scatter(self.x[cluster_labels==i-1, 0], self.x[cluster_labels==i-1, 1], c=colors[i], label=f'Cluster {i-1}')
+        plt.title('HDBSCAN Clustering Results')
+        plt.xlabel('Feature 1')
+        plt.ylabel('Feature 2')
+        plt.legend()
+        plt.savefig("./c.png")
+
+        # クラスタリング結果を表示
+        l = []
+        dic = {
+            i: [] for i in range(label_num)
+        }
+        n_clusters = len(set(cluster_labels)) - (1 if -1 in cluster_labels else 0)
+        for index, i in enumerate(list(cluster_labels)):
+            if i != -1:
+                dic[i].append(index)
+        n_noise = list(cluster_labels).count(-1)
+        print(f'推定されたクラスタ数: {n_clusters}')
+        print(f'ノイズとして分類されたポイント数: {n_noise}')
+        
+        return self.x, dic
         
         
         
