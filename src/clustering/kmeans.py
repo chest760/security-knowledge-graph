@@ -72,16 +72,10 @@ class Clustering:
         # x = self.pca.fit_transform(x)
 
         mapper = umap.UMAP(random_state=42,  metric="cosine",
-                           n_neighbors=10, n_components=2, min_dist=0.1)
+                           n_neighbors=9, n_components=2, min_dist=0.4)
         x = mapper.fit_transform(x)
         
         self.x = x
-        
-        # self.kmeans(8)
-        
-        self.hierarchy()
-        
-        # self.hdbscan()
     
     def get_embedding(self) -> torch.tensor:
         client = VoyageAI()
@@ -90,16 +84,17 @@ class Clustering:
             id = series["ID"]
             emb = client.read_embedding(id=id)
             
-            # id = int(id[5:])
-            # names = []
-            # # names = self.domain_mechanism[self.domain_mechanism["ID"] == id]["Mechanism"].item().split(",")
-            # names.extend(self.domain_mechanism[self.domain_mechanism["ID"] == id]["Mechanism"].item().split(","))
+            id = int(id[5:])
+            names = []
+            # names = self.domain_mechanism[self.domain_mechanism["ID"] == id]["Mechanism"].item().split(",")
+            names.extend(self.domain_mechanism[self.domain_mechanism["ID"] == id]["Mechanism"].item().split(","))
             
-            # category_emb = 0
-            # for name in names:
-            #     category_emb += client.read_category_embedding(category=name.strip())
+            category_emb = 0
+            for name in names:
+                category=name.strip()
+                category_emb += client.read_category_embedding(category)
             
-            # emb = torch.cat([emb, category_emb])
+            emb = torch.cat([emb, category_emb])
             
             embs.append(emb)
         
@@ -156,7 +151,7 @@ class Clustering:
         plt.ylabel('Euclidean distance')
         plt.savefig("./a.png")
 
-        num_clusters = 15
+        num_clusters = 7
         clusters = fcluster(Z, num_clusters, criterion='maxclust')
 
         # クラスタリング結果のプロット
@@ -177,10 +172,12 @@ class Clustering:
         plt.savefig("./b.png")
         
         print(dic)
+        
+        return self.x, dic
     
     def hdbscan(self):
         # HDBSCANモデルを作成し、フィッティング
-        clusterer = hdbscan.HDBSCAN(min_cluster_size=20, min_samples=1)
+        clusterer = hdbscan.HDBSCAN(min_cluster_size=10, min_samples=1)
         cluster_labels = clusterer.fit_predict(self.x)
         
         # clusterer.single_linkage_tree_.plot(cmap='viridis', colorbar=True)
@@ -212,7 +209,16 @@ class Clustering:
         print(f'ノイズとして分類されたポイント数: {n_noise}')
         
         return self.x, dic
+    
+    
+    def run(self):
+        # self.kmeans(8)
         
+        x, dic = self.hierarchy()
+        
+        # x, dic = self.hdbscan()
+        
+        return x, dic
         
         
     
@@ -224,4 +230,4 @@ if __name__ == "__main__":
         data=data,
         categoty=capec_category,
         domain_mechanism=capec_domain_mechanism
-    )
+    ).run()
